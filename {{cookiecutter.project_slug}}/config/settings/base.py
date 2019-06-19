@@ -26,7 +26,7 @@ DEBUG = env.bool("DJANGO_DEBUG", False)
 # In Windows, this must be set to your system time zone.
 TIME_ZONE = env("DJANGO_TIME_ZONE", default="{{ cookiecutter.timezone }}") # pai
 # https://docs.djangoproject.com/en/dev/ref/settings/#language-code
-LANGUAGE_CODE = env("DJANGO_LANGUAGE_CODE", "en-us") # pai
+LANGUAGE_CODE = env("DJANGO_LANGUAGE_CODE", default="en-us") # pai
 # https://docs.djangoproject.com/en/dev/ref/settings/#site-id
 SITE_ID = env.int("DJANGO_SITE_ID", default=1) # pai
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-i18n
@@ -90,7 +90,9 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
+{% if cookiecutter.use_django_rest_framework_kong_consumers == 'n' -%}
     "{{ cookiecutter.project_slug }}.users.apps.UsersConfig",
+{%- endif %}
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -321,14 +323,16 @@ STATICFILES_FINDERS += ["compressor.finders.CompressorFinder"]
 # Your stuff...
 
 # pai
+ENABLE_HTTPS = env.bool("ENABLE_HTTPS", False)
+
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = env("ACCOUNT_DEFAULT_HTTP_PROTOCOL", default="https" if ENABLE_HTTPS else "http")
 APPEND_SLASH = True
 
-APP_DOMAIN = os.getenv('APP_DOMAIN', '{{cookiecutter.domain_name}}')
-APP_DOMAINS = os.environ.get('APP_DOMAINS', APP_DOMAIN)
+APP_DOMAIN = env("APP_DOMAIN", default="{{cookiecutter.domain_name}}")
+APP_DOMAINS = env.list("APP_DOMAINS", default=[APP_DOMAIN, ])
 APP_URL = ACCOUNT_DEFAULT_HTTP_PROTOCOL + '://' + APP_DOMAIN
 
-
-COOKIE_DOMAIN = os.environ.get('COOKIE_DOMAIN', APP_DOMAIN)
+COOKIE_DOMAIN = env("COOKIE_DOMAIN", default=APP_DOMAIN)
 
 # cors
 if DEBUG:
@@ -336,11 +340,10 @@ if DEBUG:
 else:
     # https://github.com/ottoyiu/django-cors-headers
     # CORS headers defaults to '{{cookiecutter.domain_name}}'
-    _CORS_ORIGINS = os.environ.get('CORS_ORIGINS', '{0}'.format(COOKIE_DOMAIN))
+    _CORS_ORIGINS = env("CORS_ORIGINS", default='{0}'.format(COOKIE_DOMAIN))
     CORS_ORIGIN_WHITELIST = list(map(lambda x: '{}'.format(x.replace(' ', '')), _CORS_ORIGINS.split(',')))
     #CORS_ORIGIN_WHITELIST = _CORS_ORIGINS.split(',')
     CORS_ALLOW_CREDENTIALS = True
-
 
 {% if cookiecutter.use_django_rest_framework_kong_consumers == 'y' -%}
 # django-rest-framework

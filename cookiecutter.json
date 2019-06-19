@@ -1,7 +1,7 @@
 {
-  "project_name": "My Awesome Project",
+  "project_name": "Django Fisherman",
   "project_slug": "{{ cookiecutter.project_name.lower()|replace(' ', '_')|replace('-', '_')|replace('.', '_')|trim() }}",
-  "description": "Behold My Awesome Project!",
+  "description": "It never runs out of fish..",
   "author_name": "Luca Bertuol",
   "domain_name": "example.com",
   "email": "paiuolo@gmail.com",
@@ -18,9 +18,9 @@
   "use_pycharm": "n",
   "use_docker": "y",
   "postgresql_version": [
+    "9.6",
     "11.3",
     "10.8",
-    "9.6",
     "9.5",
     "9.4"
   ],
@@ -47,6 +47,6 @@
 
 
 
-  "use_django_sso_app_profiles": "y",
+  "use_django_sso_app_profiles": "n",
   "use_django_rest_framework_kong_consumers": "{% if cookiecutter.use_django_sso_app_profiles.lower() == 'y' %}n{% else %}y{% endif %}"
 }
