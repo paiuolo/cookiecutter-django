@@ -2,10 +2,10 @@
   "project_name": "My Awesome Project",
   "project_slug": "{{ cookiecutter.project_name.lower()|replace(' ', '_')|replace('-', '_')|replace('.', '_')|trim() }}",
   "description": "Behold My Awesome Project!",
-  "author_name": "Daniel Roy Greenfeld",
+  "author_name": "Luca Bertuol",
   "domain_name": "example.com",
   "email": "{{ cookiecutter.author_name.lower()|replace(' ', '-') }}@example.com",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "open_source_license": [
     "MIT",
     "BSD",
@@ -29,9 +29,9 @@
     "Gulp"
   ],
   "cloud_provider": [
+    "None",
     "AWS",
-    "GCP",
-    "None"
+    "GCP"
   ],
   "custom_bootstrap_compilation": "n",
   "use_compressor": "n",
@@ -43,7 +43,7 @@
   "use_travisci": "n",
   "keep_local_envs_in_vcs": "y",
 
-  "debug": "n",
+  "debug": "y",
 
 
 
