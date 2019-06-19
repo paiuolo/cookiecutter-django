@@ -24,11 +24,11 @@ DEBUG = env.bool("DJANGO_DEBUG", False)
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # though not all of them may be available with every OS.
 # In Windows, this must be set to your system time zone.
-TIME_ZONE = "{{ cookiecutter.timezone }}"
+TIME_ZONE = env("DJANGO_TIME_ZONE", default="{{ cookiecutter.timezone }}") # pai
 # https://docs.djangoproject.com/en/dev/ref/settings/#language-code
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = env("DJANGO_LANGUAGE_CODE", "en-us") # pai
 # https://docs.djangoproject.com/en/dev/ref/settings/#site-id
-SITE_ID = 1
+SITE_ID = env.int("DJANGO_SITE_ID", default=1) # pai
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-i18n
 USE_I18N = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-l10n
@@ -71,9 +71,18 @@ DJANGO_APPS = [
 ]
 THIRD_PARTY_APPS = [
     "crispy_forms",
+# pai
+{%- if cookiecutter.use_django_sso_app_profiles == 'y' %}
+    "django_sso_app",
+{%- else %}
+    {%- if cookiecutter.use_django_rest_framework_kong_consumers == 'y' %}
+    "django_rest_framework_kong_consumers",
+    {%- else %}
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    {%- endif %}
+{%- endif %}
     "rest_framework",
 {%- if cookiecutter.use_celery == 'y' %}
     "django_celery_beat",

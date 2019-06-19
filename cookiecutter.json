@@ -43,5 +43,10 @@
   "use_travisci": "n",
   "keep_local_envs_in_vcs": "y",
 
-  "debug": "n"
+  "debug": "n",
+
+
+
+  "use_django_sso_app_profiles": "y",
+  "use_django_rest_framework_kong_consumers": "{% if cookiecutter.use_django_sso_app_profiles.lower() == 'y' %}n{% else %}y{% endif %}"
 }

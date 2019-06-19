@@ -32,3 +32,17 @@ django-redis==4.10.0  # https://github.com/niwinz/django-redis
 # Django REST Framework
 djangorestframework==3.9.4  # https://github.com/encode/django-rest-framework
 coreapi==2.3.3  # https://github.com/core-api/python-client
+
+
+# pai
+
+# CORS
+django-cors-headers==3.0.2
+
+# django-sso
+{%- if cookiecutter.use_django_sso_app_profiles == 'y' %}
+django-sso-app
+{%- endif %}
+{%- if cookiecutter.use_django_rest_framework_kong_consumers == 'y' %}
+django-rest-framework-kong-consumers
+{%- endif %}
