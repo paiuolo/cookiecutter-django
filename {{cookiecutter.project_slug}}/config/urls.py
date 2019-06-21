@@ -12,18 +12,20 @@ urlpatterns = [
     ),
     # Django Admin, use {% raw %}{% url 'admin:index' %}{% endraw %}
     path(settings.ADMIN_URL, admin.site.urls),
+
+# pai
+{%- if cookiecutter.use_django_allauth == 'y' %}
     # User management
-{%- if cookiecutter.use_django_sso_app_profiles == 'y' %}
-    path("users/", include("{{ cookiecutter.project_slug }}.users.urls", namespace="users")),
-{%- else %}
-    {%- if cookiecutter.use_django_rest_framework_kong_consumers == 'y' %}
-    path('consumers/', include("django_rest_framework_kong_consumers.urls.consumers_urls")),
-    {%- else %}
     path("users/", include("{{ cookiecutter.project_slug }}.users.urls", namespace="users")),
     path("accounts/", include("allauth.urls")),
-    {%- endif %}
 {%- endif %}
     # Your stuff: custom urls includes go here
+
+    # pai
+{%- if cookiecutter.use_django_sso_app == 'y' %}
+    path("profiles/", include(("apps.profiles.urls", "profiles"), namespace="profiles")),
+{%- endif %}
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

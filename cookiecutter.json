@@ -45,6 +45,6 @@
 
   "debug": "y",
 
-
+  "use_django_allauth": "n",
   "use_django_sso_app": "y"
 }

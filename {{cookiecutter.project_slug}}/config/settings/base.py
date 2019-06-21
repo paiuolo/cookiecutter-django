@@ -71,9 +71,12 @@ DJANGO_APPS = [
 ]
 THIRD_PARTY_APPS = [
     "crispy_forms",
+# pai
+{%- if cookiecutter.use_django_allauth == 'y' %}
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+{%- endif %}
     "rest_framework",
 {%- if cookiecutter.use_celery == 'y' %}
     "django_celery_beat",
@@ -141,6 +144,10 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+# pai
+{%- if cookiecutter.use_django_sso_app == 'y' %}
+    'django_sso_app.middleware.SsoMiddleware',
+{% endif %}
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -283,8 +290,9 @@ CELERY_TASK_SOFT_TIME_LIMIT = 60
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 {%- endif %}
+
 # pai
-{% if cookiecutter.use_django_sso_app_profiles != 'y' -%}
+{%- if cookiecutter.use_django_allauth == 'y' %}
 # django-allauth
 # ------------------------------------------------------------------------------
 ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
@@ -306,7 +314,6 @@ SOCIALACCOUNT_ADAPTER = "{{cookiecutter.project_slug}}.users.adapters.SocialAcco
 # https://django-compressor.readthedocs.io/en/latest/quickstart/#installation
 INSTALLED_APPS += ["compressor"]
 STATICFILES_FINDERS += ["compressor.finders.CompressorFinder"]
-
 {%- endif %}
 # Your stuff...
 
@@ -333,4 +340,23 @@ else:
     #CORS_ORIGIN_WHITELIST = _CORS_ORIGINS.split(',')
     CORS_ALLOW_CREDENTIALS = True
 
+{%- if cookiecutter.use_django_sso_app == 'y' %}
+# django-sso-app
+DJANGO_SSO_USER_PROFILE_MODEL = 'apps.profiles.models.Profile'
+
+AUTHENTICATION_BACKENDS = (
+    'django_sso_app.backends.SsoBackend',
+    'django.contrib.auth.backends.ModelBackend'
+)
+
+_LOGGING_LEVEL = 'INFO'
+if DEBUG:
+    _LOGGING_LEVEL = 'DEBUG'
+
+LOGGING['django_sso_app'] = {
+    'handlers': ['console'],
+    'propagate': True,
+    'level': _LOGGING_LEVEL
+}
+{%- endif %}
 # ------------------------------------------------------------------------------
