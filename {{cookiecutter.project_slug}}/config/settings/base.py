@@ -71,28 +71,22 @@ DJANGO_APPS = [
 ]
 THIRD_PARTY_APPS = [
     "crispy_forms",
-# pai
-{%- if cookiecutter.use_django_sso_app_profiles == 'y' %}
-    "django_sso_app",
-{%- else %}
-    {%- if cookiecutter.use_django_rest_framework_kong_consumers == 'y' %}
-    "django_rest_framework_kong_consumers",
-    {%- else %}
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
-    {%- endif %}
-{%- endif %}
     "rest_framework",
 {%- if cookiecutter.use_celery == 'y' %}
     "django_celery_beat",
 {%- endif %}
+# pai
+    "apps.profiles",
+{%- if cookiecutter.use_django_sso_app == 'y' %}
+    "django_sso_app",
+{%- endif %}
 ]
 
 LOCAL_APPS = [
-{% if cookiecutter.use_django_rest_framework_kong_consumers == 'n' -%}
     "{{ cookiecutter.project_slug }}.users.apps.UsersConfig",
-{%- endif %}
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -111,13 +105,7 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
-# pai
-{% if cookiecutter.use_django_rest_framework_kong_consumers == 'y' -%}
-AUTH_USER_MODEL = 'django_rest_framework_kong_consumers.Consumer'
-{%- else %}
 AUTH_USER_MODEL = "users.User"
-{%- endif %}
-
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
 LOGIN_REDIRECT_URL = "users:redirect"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
@@ -296,7 +284,7 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 {%- endif %}
 # pai
-{% if cookiecutter.use_django_sso_app_profiles != 'y' or cookiecutter.use_django_rest_framework_kong_consumers != 'y' -%}
+{% if cookiecutter.use_django_sso_app_profiles != 'y' -%}
 # django-allauth
 # ------------------------------------------------------------------------------
 ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
@@ -344,14 +332,5 @@ else:
     CORS_ORIGIN_WHITELIST = list(map(lambda x: '{}'.format(x.replace(' ', '')), _CORS_ORIGINS.split(',')))
     #CORS_ORIGIN_WHITELIST = _CORS_ORIGINS.split(',')
     CORS_ALLOW_CREDENTIALS = True
-
-{% if cookiecutter.use_django_rest_framework_kong_consumers == 'y' -%}
-# django-rest-framework
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'django_rest_framework_kong_consumers.authentication.KongConsumerAuthentication'
-    ]
-}
-{%- endif %}
 
 # ------------------------------------------------------------------------------

@@ -3,16 +3,24 @@ from rest_framework import mixins
 from rest_framework import permissions
 from rest_framework.response import Response
 
-from .models import Profile
-from .serializers import ProfileSerializer
+from django.contrib.auth import get_user_model
+from django.http import Http404
 
+from .models import Profile
+from .serializers import ProfileSerializer, ProfilePublicSerializer
+
+
+User = get_user_model()
 
 class ProfileViewSet(viewsets.ReadOnlyModelViewSet):
     """
     A simple ViewSet for viewing Profiles.
     """
     queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
+    serializer_class = ProfilePublicSerializer
+
+    def list(self, request, *args, **kwargs):
+        return super(ProfileViewSet, self).list(request, *args, **kwargs)
 
 
 class UserProfileViewSet( mixins.RetrieveModelMixin,

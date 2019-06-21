@@ -46,7 +46,5 @@
   "debug": "y",
 
 
-
-  "use_django_sso_app_profiles": "n",
-  "use_django_rest_framework_kong_consumers": "{% if cookiecutter.use_django_sso_app_profiles.lower() == 'y' %}n{% else %}y{% endif %}"
+  "use_django_sso_app": "y"
 }

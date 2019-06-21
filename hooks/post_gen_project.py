@@ -112,20 +112,6 @@ def append_to_project_gitignore(path):
         gitignore_file.write(os.linesep)
 
 
-# pai
-def remove_django_sso_app_profile_files():
-    docs_dir_path = os.path.join("apps", "profiles")
-    if os.path.exists(docs_dir_path):
-        shutil.rmtree(docs_dir_path)
-
-
-def remove_custom_user_app():
-    docs_dir_path = os.path.join("{{ cookiecutter.project_slug }}", "users")
-    if os.path.exists(docs_dir_path):
-        shutil.rmtree(docs_dir_path)
-
-
-
 def generate_random_string(
     length, using_digits=False, using_ascii_letters=False, using_punctuation=False
 ):
@@ -356,12 +342,6 @@ def main():
     if "{{ cookiecutter.use_travisci }}".lower() == "n":
         remove_dottravisyml_file()
 
-    # pai
-    if "{{ cookiecutter.use_django_sso_app_profiles }}".lower() == "n":
-        remove_django_sso_app_profile_files()
-
-    if "{{ cookiecutter.use_django_rest_framework_kong_consumers }}".lower() == "y":
-        remove_custom_user_app()
 
     print(SUCCESS + "Project initialized, keep up the good work!" + TERMINATOR)
 
