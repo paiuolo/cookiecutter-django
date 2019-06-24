@@ -1,9 +1,80 @@
-from rest_framework.permissions import AllowAny
+import logging
+import os
+from mimetypes import MimeTypes
+
+from django.conf import settings
+from django.forms.forms import NON_FIELD_ERRORS
+from django.http import Http404
+from django.http import HttpResponse
+from django.http.response import HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404
+
+from rest_framework import generics, viewsets, permissions, parsers, status, \
+    response
 from rest_framework.response import Response
-from rest_framework.schemas import SchemaGenerator
+from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 
+from rest_framework.permissions import AllowAny
+from rest_framework.schemas import SchemaGenerator
+
 from rest_framework_swagger import renderers
+
+logger = logging.getLogger('django')
+
+
+class HealthView(APIView):
+    """
+    Return instance stats.
+    """
+
+    # permission_classes = (permissions.AllowAny,)
+
+    def get(self, request, format=None):
+        try:
+            stats = os.statvfs(path)
+            free_space_mb = int(
+                (stats.f_bavail * stats.f_frsize) / (1024 * 1024))
+
+            logger.info(
+                'Free space (MB): {}.'.format(free_space_mb)
+
+            status = 'red'
+            if free_space_mb > 100:
+                status = 'green'
+            else:
+                status = 'yellow'
+
+            data = {
+                'status': status,
+            }
+
+            if request.user.is_staff:
+                data['free_space_mb'] = free_space_mb
+
+            return Response(data, status.HTTP_200_OK)
+        except:
+            logger.exception('Error getting health')
+
+
+class APIRoot(APIView):
+    """
+    API Root.
+    """
+
+    # permission_classes = (permissions.AllowAny,)
+
+    def get(self, request, format=None):
+        try:
+            return Response({
+                'health': reverse('health', request=request, format=format),
+
+                'profiles': reverse('consumer-list', request=request,
+                                     format=format),
+                'groups': reverse('group-list', request=request, format=format)
+            })
+        except:
+            logger.exception('Error getting api-root')
 
 
 class SwaggerSchemaView(APIView):

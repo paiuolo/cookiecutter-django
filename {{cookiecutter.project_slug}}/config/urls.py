@@ -9,14 +9,14 @@ from django.utils import timezone
 from django.views.decorators.http import last_modified
 from django.views.i18n import JavaScriptCatalog
 
-from rest_framework_swagger.views import get_swagger_view
+from {{cookiecutter.project_slug}}.views import SwaggerSchemaView, APIRoot
 
-from {{cookiecutter.project_slug}}.views import SwaggerSchemaView
 from apps.profiles.urls import urlpatterns as profiles_urls
 
 
 last_modified_date = timezone.now()
 js_info_dict = {}
+
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
@@ -75,10 +75,12 @@ if settings.DEBUG:
 api_urlpatterns = [
     # mine
     url(r'^api/v1/', include(profiles_urls)),
+
 ]
 
 urlpatterns += api_urlpatterns
 
 urlpatterns += [
-    url(r'^$', SwaggerSchemaView.as_view(patterns=api_urlpatterns))
+    url(r'^api/v1/$', APIRoot.as_view()),
+    url(r'^api/v1/swagger/$', SwaggerSchemaView.as_view(patterns=api_urlpatterns))
 ]
