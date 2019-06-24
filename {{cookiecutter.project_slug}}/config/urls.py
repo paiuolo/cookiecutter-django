@@ -11,7 +11,7 @@ from django.views.i18n import JavaScriptCatalog
 
 from rest_framework_swagger.views import get_swagger_view
 
-from backend.views import SwaggerSchemaView
+from {{cookiecutter.project_slug}}.views import SwaggerSchemaView
 from apps.profiles.urls import urlpatterns as profiles_urls
 
 

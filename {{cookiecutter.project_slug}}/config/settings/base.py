@@ -213,7 +213,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
 
                 # pai
-                'backend.context_processors.get_repository_rev',
+                '{{cookiecutter.project_slug}}.context_processors.get_repository_rev',
             ],
         },
     }
@@ -386,6 +386,7 @@ else:
 
 {%- if cookiecutter.use_django_sso_app == 'y' %}
 # django-sso-app
+
 DJANGO_SSO_USER_PROFILE_MODEL = 'apps.profiles.models.Profile'
 
 AUTHENTICATION_BACKENDS = (
