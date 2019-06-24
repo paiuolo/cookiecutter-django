@@ -306,6 +306,8 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 # pai
 
+gettext = lambda s: s
+
 LANGUAGES = (
     ## Customize this
     ('it', gettext('it')),

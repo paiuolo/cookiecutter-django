@@ -1,16 +1,6 @@
 import logging
 import os
-from mimetypes import MimeTypes
 
-from django.conf import settings
-from django.forms.forms import NON_FIELD_ERRORS
-from django.http import Http404
-from django.http import HttpResponse
-from django.http.response import HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
-
-from rest_framework import generics, viewsets, permissions, parsers, status, \
-    response
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
@@ -21,6 +11,7 @@ from rest_framework.schemas import SchemaGenerator
 from rest_framework_swagger import renderers
 
 logger = logging.getLogger('django')
+CURRENT_DIR = os.getcwd()
 
 
 class HealthView(APIView):
@@ -28,16 +19,16 @@ class HealthView(APIView):
     Return instance stats.
     """
 
-    # permission_classes = (permissions.AllowAny,)
+    permission_classes = (AllowAny, )
 
     def get(self, request, format=None):
         try:
-            stats = os.statvfs(path)
+            stats = os.statvfs(CURRENT_DIR)
             free_space_mb = int(
                 (stats.f_bavail * stats.f_frsize) / (1024 * 1024))
 
             logger.info(
-                'Free space (MB): {}.'.format(free_space_mb)
+                'Free space (MB): {}.'.format(free_space_mb))
 
             status = 'red'
             if free_space_mb > 100:

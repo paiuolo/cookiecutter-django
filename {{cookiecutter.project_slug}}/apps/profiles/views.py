@@ -4,10 +4,11 @@ from rest_framework import permissions
 from rest_framework.response import Response
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.http import Http404
 
 from .models import Profile
-from .serializers import ProfileSerializer, ProfilePublicSerializer
+from .serializers import ProfileSerializer, ProfilePublicSerializer, GroupSerializer
 
 
 User = get_user_model()
@@ -48,3 +49,11 @@ class UserProfileViewSet( mixins.RetrieveModelMixin,
         serializer = ProfileSerializer(profile)
         return Response(serializer.data)
 
+
+class GroupViewSet(viewsets.ReadOnlyModelViewSet):
+
+    serializer_class = GroupSerializer
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        return Group.objects.all()
