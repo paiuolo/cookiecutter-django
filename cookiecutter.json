@@ -1,6 +1,6 @@
 {
   "project_name": "Django Fisherman",
-  "project_slug": "{{ cookiecutter.project_name.lower()|replace(' ', '_')|replace('-', '_')|replace('.', '_')|trim() }}",
+  "project_slug": "backend",
   "description": "It never runs out of fish..",
   "author_name": "Luca Bertuol",
   "domain_name": "example.com",

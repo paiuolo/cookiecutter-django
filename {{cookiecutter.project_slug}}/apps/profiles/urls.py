@@ -1,14 +1,12 @@
 from django.conf.urls import url
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from .views import ProfileViewSet, UserProfileViewSet, GroupViewSet
+from .views import ProfileViewSet
 
 
 urlpatterns = [
-    url(r'profiles/$', ProfileViewSet.as_view({'get': 'list'}), name="profiles-list"),
-    url(r'profiles/(?P<user_id>[0-9A-Fa-f-]+)/$', UserProfileViewSet.as_view({'get': 'get'}), name="profiles-detail"),
-
-    url(r'^groups/$', GroupViewSet.as_view({'get': 'list'}), name="group-list"),
+    url(r'^profile/$', ProfileViewSet.as_view({'get': 'list'}), name="list"),
+    url(r'^profile/(?P<pk>[0-9A-Fa-f-]+)/$', ProfileViewSet.as_view({'get': 'retrieve'}), name="detail"),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

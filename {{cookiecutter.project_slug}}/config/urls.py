@@ -40,11 +40,6 @@ urlpatterns = [
 {%- endif %}
     # Your stuff: custom urls includes go here
 
-    # pai
-{%- if cookiecutter.use_django_sso_app == 'y' %}
-    path("profiles/", include(("apps.profiles.urls", "profiles"), namespace="profiles")),
-{%- endif %}
-
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
@@ -75,15 +70,18 @@ if settings.DEBUG:
 
 # pai
 api_urlpatterns = [
-    # mine
-    url(r'^api/v1/_stats/$', HealthView.as_view(), name="health"),
-    url(r'^api/v1/', include(profiles_urls)),
+    url(r'^api/v1/_stats/$', StatsView.as_view(), name="stats"),
 
+    url(r'^api/v1/profiles/', include((profiles_urls, 'profiles'), namespace="profile")),
+    url(r'^api/v1/groups/', include((groups_urls, 'groups'), namespace="group")),
+
+    # custom API urls here
 ]
 
 urlpatterns += api_urlpatterns
 
 urlpatterns += [
-    url(r'^api/v1/$', APIRoot.as_view()),
-    url(r'^api/v1/swagger/$', SwaggerSchemaView.as_view(patterns=api_urlpatterns))
+    url(r'^api/v1/ui/$', APIRoot.as_view()),
+    url(r'^api/v1/$', SwaggerSchemaView.as_view(patterns=api_urlpatterns))
 ]
+

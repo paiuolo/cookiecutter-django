@@ -14,14 +14,14 @@ logger = logging.getLogger('django')
 CURRENT_DIR = os.getcwd()
 
 
-class HealthView(APIView):
+class StatsView(APIView):
     """
-    Return instance stats.
+    Return instance stats
     """
 
     permission_classes = (AllowAny, )
 
-    def get(self, request, format=None):
+    def get(self, request):
         try:
             stats = os.statvfs(CURRENT_DIR)
             free_space_mb = int(
@@ -52,31 +52,34 @@ class HealthView(APIView):
 
 class APIRoot(APIView):
     """
-    API Root.
+    API Root
     """
+    permission_classes = (AllowAny,)
 
-    # permission_classes = (permissions.AllowAny,)
-
-    def get(self, request, format=None):
+    def get(self, request):
         try:
             return Response({
-                'health': reverse('health', request=request, format=format),
+                'stats': reverse('stats', request=request),
 
-                'profiles': reverse('profiles-list', request=request, format=format),
-                'groups': reverse('group-list', request=request, format=format),
+                'profiles': reverse('profiles:list', request=request),
+                'groups': reverse('groups:list', request=request),
 
+                'basins': reverse('basins:list', request=request),
             })
         except:
             logger.exception('Error getting api-root')
 
 
 class SwaggerSchemaView(APIView):
-    permission_classes = [AllowAny]
-    renderer_classes = [
+    """
+    OpenAPI
+    """
+    permission_classes = (AllowAny,)
+    renderer_classes = (
         renderers.OpenAPIRenderer,
         renderers.SwaggerUIRenderer
-    ]
-    title = '{{cookiecutter.project_name}}'
+    )
+    title = 'Django Fisherman'
     patterns = []
 
     def get(self, request):
