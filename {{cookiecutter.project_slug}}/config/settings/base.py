@@ -86,10 +86,10 @@ THIRD_PARTY_APPS = [
     "django_celery_beat",
 {%- endif %}
     # pai
-    "apps.profiles",
 {%- if cookiecutter.use_django_sso_app == 'y' %}
     "django_sso_app",
 {%- endif %}
+    "apps.profiles",
 ]
 
 LOCAL_APPS = [
@@ -370,7 +370,7 @@ if DEBUG:
 else:
     # https://github.com/ottoyiu/django-cors-headers
     # CORS headers defaults to '{{cookiecutter.domain_name}}'
-    _CORS_ORIGINS = env("CORS_ORIGINS", default='{0}'.format(COOKIE_DOMAIN))
+    _CORS_ORIGINS = env("CORS_ORIGINS", default='{0}://{1}'.format(ACCOUNT_DEFAULT_HTTP_PROTOCOL, COOKIE_DOMAIN))
     CORS_ORIGIN_WHITELIST = list(map(lambda x: '{}'.format(x.replace(' ', '')), _CORS_ORIGINS.split(',')))
     #CORS_ORIGIN_WHITELIST = _CORS_ORIGINS.split(',')
     CORS_ALLOW_CREDENTIALS = True

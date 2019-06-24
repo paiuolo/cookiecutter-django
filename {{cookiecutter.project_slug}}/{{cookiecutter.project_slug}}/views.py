@@ -4,9 +4,9 @@ import os
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
-
 from rest_framework.permissions import AllowAny
 from rest_framework.schemas import SchemaGenerator
+from rest_framework import status
 
 from rest_framework_swagger import renderers
 
@@ -30,14 +30,16 @@ class HealthView(APIView):
             logger.info(
                 'Free space (MB): {}.'.format(free_space_mb))
 
-            status = 'red'
-            if free_space_mb > 100:
-                status = 'green'
+            if free_space_mb > 200:
+                health_status = 'green'
             else:
-                status = 'yellow'
+                if free_space_mb < 100:
+                    health_status = 'yellow'
+                else:
+                    health_status = 'red'
 
             data = {
-                'status': status,
+                'status': health_status,
             }
 
             if request.user.is_staff:
@@ -60,9 +62,9 @@ class APIRoot(APIView):
             return Response({
                 'health': reverse('health', request=request, format=format),
 
-                'profiles': reverse('consumer-list', request=request,
-                                     format=format),
-                'groups': reverse('group-list', request=request, format=format)
+                'profiles': reverse('profiles-list', request=request, format=format),
+                'groups': reverse('group-list', request=request, format=format),
+
             })
         except:
             logger.exception('Error getting api-root')
