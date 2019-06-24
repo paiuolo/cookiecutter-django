@@ -5,10 +5,10 @@ from .views import ProfileViewSet, UserProfileViewSet
 
 
 urlpatterns = [
-    url(r'user/$', UserProfileViewSet.as_view({'get': 'get'})),
+    url(r'profiles/$', ProfileViewSet.as_view({'get': 'list'}), name="profiles-list"),
+    url(r'profiles/(?P<user_id>[0-9A-Fa-f-]+)/$', UserProfileViewSet.as_view({'get': 'get'}), name="profiles-detail"),
 
-    url(r'^$', ProfileViewSet.as_view({'get': 'list'})),
+    url(r'^groups/$', GroupViewSet.as_view({'get': 'list'}), name="group-list"),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
-

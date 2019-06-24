@@ -1,9 +1,22 @@
 from django.conf import settings
-from django.urls import include, path
+from django.urls import include, path, url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView
 from django.views import defaults as default_views
+# pai
+from django.utils import timezone
+from django.views.decorators.http import last_modified
+from django.views.i18n import JavaScriptCatalog
+
+from rest_framework_swagger.views import get_swagger_view
+
+from backend.views import SwaggerSchemaView
+from apps.profiles.urls import urlpatterns as profiles_urls
+
+
+last_modified_date = timezone.now()
+js_info_dict = {}
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
@@ -13,7 +26,11 @@ urlpatterns = [
     # Django Admin, use {% raw %}{% url 'admin:index' %}{% endraw %}
     path(settings.ADMIN_URL, admin.site.urls),
 
-# pai
+    # pai
+    url(r'^i18n/', include('django.conf.urls.i18n')),
+    url(r'^jsi18n/$', last_modified(lambda req, **kw: last_modified_date)(JavaScriptCatalog.as_view()), js_info_dict,
+        name='javascript-catalog'),
+
 {%- if cookiecutter.use_django_allauth == 'y' %}
     # User management
     path("users/", include("{{ cookiecutter.project_slug }}.users.urls", namespace="users")),
@@ -53,3 +70,15 @@ if settings.DEBUG:
         import debug_toolbar
 
         urlpatterns = [path("__debug__/", include(debug_toolbar.urls))] + urlpatterns
+
+# pai
+api_urlpatterns = [
+    # mine
+    url(r'^api/v1/', include(profiles_urls)),
+]
+
+urlpatterns += api_urlpatterns
+
+urlpatterns += [
+    url(r'^$', SwaggerSchemaView.as_view(patterns=api_urlpatterns))
+]

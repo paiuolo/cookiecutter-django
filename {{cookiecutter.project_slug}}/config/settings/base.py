@@ -71,17 +71,21 @@ DJANGO_APPS = [
 ]
 THIRD_PARTY_APPS = [
     "crispy_forms",
-# pai
+    # pai
+    "corsheaders",
 {%- if cookiecutter.use_django_allauth == 'y' %}
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
 {%- endif %}
     "rest_framework",
+    "rest_framework.authtoken",
+    "rest_framework_swagger",
+    "django_filters",
 {%- if cookiecutter.use_celery == 'y' %}
     "django_celery_beat",
 {%- endif %}
-# pai
+    # pai
     "apps.profiles",
 {%- if cookiecutter.use_django_sso_app == 'y' %}
     "django_sso_app",
@@ -138,13 +142,19 @@ AUTH_PASSWORD_VALIDATORS = [
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
 MIDDLEWARE = [
+    # pai
+    "backend.middleware.x_forwarded_for.middleware.XForwardedForMiddleware",
+
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    # pai
+    "corsheaders.middleware.CorsMiddleware",
+
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-# pai
+    # pai
 {%- if cookiecutter.use_django_sso_app == 'y' %}
     'django_sso_app.middleware.SsoMiddleware',
 {% endif %}
@@ -201,6 +211,9 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
+
+                # pai
+                'backend.context_processors.get_repository_rev',
             ],
         },
     }
@@ -292,6 +305,18 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 {%- endif %}
 
 # pai
+
+LANGUAGES = (
+    ## Customize this
+    ('it', gettext('it')),
+    ('en', gettext('en')),
+    ('es', gettext('es')),
+    ('pt', gettext('pt')),
+    ('fr', gettext('fr')),
+    ('de', gettext('de')),
+)
+
+# pai
 {%- if cookiecutter.use_django_allauth == 'y' %}
 # django-allauth
 # ------------------------------------------------------------------------------
@@ -318,6 +343,14 @@ STATICFILES_FINDERS += ["compressor.finders.CompressorFinder"]
 # Your stuff...
 
 # pai
+
+REPOSITORY_REV = env("REPOSITORY_REV", default=None)
+
+FILE_UPLOAD_PERMISSIONS = 0o644
+FILE_UPLOAD_HANDLERS = [
+    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+]
+
 ENABLE_HTTPS = env.bool("ENABLE_HTTPS", False)
 
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = env("ACCOUNT_DEFAULT_HTTP_PROTOCOL", default="https" if ENABLE_HTTPS else "http")
@@ -340,6 +373,17 @@ else:
     #CORS_ORIGIN_WHITELIST = _CORS_ORIGINS.split(',')
     CORS_ALLOW_CREDENTIALS = True
 
+# csrf
+# https://docs.djangoproject.com/en/2.0/ref/settings/#csrf-trusted-origins
+
+if DEBUG:
+    CSRF_COOKIE_DOMAIN = None
+    CORS_ORIGIN_ALLOW_ALL = True
+    CSRF_TRUSTED_ORIGINS = []
+else:
+    CSRF_COOKIE_DOMAIN = APP_DOMAIN
+    CSRF_TRUSTED_ORIGINS = ['.{0}'.format(COOKIE_DOMAIN)]
+
 {%- if cookiecutter.use_django_sso_app == 'y' %}
 # django-sso-app
 DJANGO_SSO_USER_PROFILE_MODEL = 'apps.profiles.models.Profile'
@@ -359,4 +403,38 @@ LOGGING['django_sso_app'] = {
     'level': _LOGGING_LEVEL
 }
 {%- endif %}
+
+# djangorestframework
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 100,
+}
+
+# swagger
+
+SWAGGER_SETTINGS = {
+    'LOGIN_URL': '/admin/login/',
+    'LOGOUT_URL': '/admin/logout/',
+    'SECURITY_DEFINITIONS': {
+        'JWT': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'description': 'Bearer xxx'
+        },
+        'token': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'description': 'Token xxx'
+        }
+    }
+}
+
 # ------------------------------------------------------------------------------
