@@ -14,6 +14,7 @@ from django.views.i18n import JavaScriptCatalog
 from {{cookiecutter.project_slug}}.views import SwaggerSchemaView, APIRoot, HealthView
 
 from apps.profiles.urls import urlpatterns as profiles_urls
+from apps.groups.urls import urlpatterns as groups_urls
 
 
 last_modified_date = timezone.now()
