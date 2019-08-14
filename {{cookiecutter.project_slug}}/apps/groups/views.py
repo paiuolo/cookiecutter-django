@@ -11,14 +11,14 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Group.objects.all()
     lookup_field = 'pk'
 
-    def list(self, request):
+    def list(self, request, *args, **kwargs):
         """
-        List
+        List groups
         """
-        return super(GroupViewSet, self).list(request)
+        return super(GroupViewSet, self).list(request, *args, **kwargs)
 
-    def retrieve(self, request, pk=None):
+    def retrieve(self, request, pk=None, *args, **kwargs):
         """
-        Detail
+        Group detail
         """
-        return super(GroupViewSet, self).retrieve(request, pk)
+        return super(GroupViewSet, self).retrieve(request, pk, *args, **kwargs)

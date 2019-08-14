@@ -5,8 +5,8 @@ from .views import GroupViewSet
 
 
 urlpatterns = [
-    url(r'^group/$', GroupViewSet.as_view({'get': 'list'}), name="list"),
-    url(r'^group/(?P<pk>[0-9A-Fa-f-]+)/$', GroupViewSet.as_view({'get': 'retrieve'}), name="detail"),
+    url(r'^$', GroupViewSet.as_view({'get': 'list'}), name="list"),
+    url(r'^(?P<pk>\w+)/$', GroupViewSet.as_view({'get': 'retrieve'}), name="detail"),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

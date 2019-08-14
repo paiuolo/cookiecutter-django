@@ -5,8 +5,8 @@ from .views import ProfileViewSet
 
 
 urlpatterns = [
-    url(r'^profile/$', ProfileViewSet.as_view({'get': 'list'}), name="list"),
-    url(r'^profile/(?P<pk>[0-9A-Fa-f-]+)/$', ProfileViewSet.as_view({'get': 'retrieve'}), name="detail"),
+    url(r'^$', ProfileViewSet.as_view({'get': 'list'}), name="list"),
+    url(r'^(?P<sso_id>[-\w]+)/$', ProfileViewSet.as_view({'get': 'retrieve'}), name="detail"),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
