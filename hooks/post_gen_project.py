@@ -116,6 +116,10 @@ def remove_django_allauth_files():
         if os.path.exists(docs_dir_path):
             shutil.rmtree(docs_dir_path)
 
+def rename_backend_folder():
+    shutil.rename("{{ cookiecutter.project_slug }}", "backend")
+
+
 
 def append_to_project_gitignore(path):
     gitignore_file_path = ".gitignore"
@@ -357,6 +361,8 @@ def main():
     # pai
     if "{{ cookiecutter.use_django_allauth }}".lower() == "n":
         remove_django_allauth_files()
+
+    rename_backend_folder()
 
     print(SUCCESS + "Project initialized, keep up the good work!" + TERMINATOR)
 
