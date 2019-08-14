@@ -117,7 +117,7 @@ def remove_django_allauth_files():
             shutil.rmtree(docs_dir_path)
 
 def rename_backend_folder():
-    shutil.rename("{{ cookiecutter.project_slug }}", "backend")
+    os.rename("{{ cookiecutter.project_slug }}", "backend")
 
 
 
@@ -358,11 +358,13 @@ def main():
     if "{{ cookiecutter.use_travisci }}".lower() == "n":
         remove_dottravisyml_file()
 
+
     # pai
     if "{{ cookiecutter.use_django_allauth }}".lower() == "n":
         remove_django_allauth_files()
 
     rename_backend_folder()
+
 
     print(SUCCESS + "Project initialized, keep up the good work!" + TERMINATOR)
 

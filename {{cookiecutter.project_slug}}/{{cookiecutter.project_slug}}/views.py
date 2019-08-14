@@ -19,7 +19,7 @@ class StatsView(APIView):
     Return instance stats
     """
 
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
 
     def get(self, request):
         try:
@@ -42,12 +42,15 @@ class StatsView(APIView):
                 'status': health_status,
             }
 
-            if request.user.is_staff:
+            if request.user is not None and request.user.is_staff:
                 data['free_space_mb'] = free_space_mb
 
             return Response(data, status.HTTP_200_OK)
-        except:
-            logger.exception('Error getting health')
+
+        except Exception as e:
+            err_msg = str(e)
+            logger.exception('Error getting health {}'.format(err_msg))
+            return Response(err_msg, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class APIRoot(APIView):
@@ -56,7 +59,7 @@ class APIRoot(APIView):
     """
     permission_classes = (AllowAny,)
 
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         try:
             return Response({
                 'stats': reverse('stats', request=request),
@@ -64,7 +67,7 @@ class APIRoot(APIView):
                 'profiles': reverse('profiles:list', request=request),
                 'groups': reverse('groups:list', request=request),
 
-                'basins': reverse('basins:list', request=request),
+                'fisherman': reverse('fisherman:api-root', request=request, *args, **kwargs),
             })
         except:
             logger.exception('Error getting api-root')
