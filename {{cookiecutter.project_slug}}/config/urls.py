@@ -82,7 +82,7 @@ api_urlpatterns = [
 urlpatterns += api_urlpatterns
 
 urlpatterns += [
-    url(r'^api/v1/ui/$', APIRoot.as_view()),
-    url(r'^api/v1/$', SwaggerSchemaView.as_view(patterns=api_urlpatterns))
+    url(r'^api/v1/ui/$', APIRoot.as_view(), name="root"),
+    url(r'^api/v1/$', SwaggerSchemaView.as_view(patterns=api_urlpatterns), name="swagger")
 ]
 
