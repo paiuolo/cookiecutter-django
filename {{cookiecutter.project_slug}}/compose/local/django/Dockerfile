@@ -15,6 +15,12 @@ RUN apk update \
   # https://docs.djangoproject.com/en/dev/ref/django-admin/#dbshell
   && apk add postgresql-client
 
+
+# pai
+RUN apk add libxslt-dev libxml2 libxml2-dev \
+  && apk add nginx supervisor
+
+
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements /requirements
 RUN pip install -r /requirements/local.txt

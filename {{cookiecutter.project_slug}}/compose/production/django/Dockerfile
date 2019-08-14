@@ -13,6 +13,13 @@ FROM python:3.6-alpine
 
 ENV PYTHONUNBUFFERED 1
 
+
+# pai
+# config files
+ENV APP_DOMAIN "{{ cookiecutter.domain_name }}"
+ENV APP_DOMAINS "{{ cookiecutter.domain_name }}"
+
+
 RUN apk update \
   # psycopg2 dependencies
   && apk add --virtual build-deps gcc python3-dev musl-dev \
@@ -21,6 +28,12 @@ RUN apk update \
   && apk add jpeg-dev zlib-dev freetype-dev lcms2-dev openjpeg-dev tiff-dev tk-dev tcl-dev \
   # CFFI dependencies
   && apk add libffi-dev py-cffi
+
+
+# pai
+RUN apk add libxslt-dev libxml2 libxml2-dev \
+  && apk add nginx supervisor
+
 
 RUN addgroup -S django \
     && adduser -S -G django django
@@ -61,6 +74,26 @@ COPY --from=client-builder /app /app
 {% else %}
 COPY . /app
 {%- endif %}
+
+
+# pai
+COPY ./compose/production/django/start-supervisor /start-supervisor
+RUN sed -i 's/\r$//g' /start-supervisor
+RUN chmod +x /start-supervisor
+
+RUN mkdir -p /app/deploy
+COPY ./deploy/nginx.conf.template /app/deploy/
+COPY ./deploy/supervisord.docker.conf /app/deploy/
+COPY deploy/supervisord.docker.conf /etc/supervisord.conf
+
+RUN mkdir -p /var/log/supervisord/
+RUN chmod a+rwx /var/log/supervisord
+RUN chmod a+rw /etc/supervisord.conf
+
+RUN chmod a+rw /etc/nginx/conf.d/default.conf
+
+RUN mkdir -p /run/nginx
+
 
 RUN chown -R django /app
 

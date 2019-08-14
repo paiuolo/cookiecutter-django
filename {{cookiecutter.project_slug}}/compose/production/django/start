@@ -5,5 +5,14 @@ set -o pipefail
 set -o nounset
 
 
+# pai
+python /app/manage.py migrate --noinput
+
+# load fixtures
+find ./fixtures/*.json -exec python manage.py loaddata {} \;
+
+
 python /app/manage.py collectstatic --noinput
-/usr/local/bin/gunicorn config.wsgi --bind 0.0.0.0:5000 --chdir=/app
+
+# pai
+exec /usr/local/bin/gunicorn config.wsgi --bind 0.0.0.0:5000 --chdir=/app

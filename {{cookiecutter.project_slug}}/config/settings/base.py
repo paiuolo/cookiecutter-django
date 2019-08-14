@@ -7,7 +7,7 @@ import environ
 ROOT_DIR = (
     environ.Path(__file__) - 3
 )  # ({{ cookiecutter.project_slug }}/config/settings/base.py - 3 = {{ cookiecutter.project_slug }}/)
-APPS_DIR = ROOT_DIR.path("{{ cookiecutter.project_slug }}")
+APPS_DIR = ROOT_DIR.path("backend")
 
 env = environ.Env()
 
@@ -88,12 +88,13 @@ THIRD_PARTY_APPS = [
     # pai
 {%- if cookiecutter.use_django_sso_app == 'y' %}
     "django_sso_app",
-{%- endif %}
     "apps.profiles",
+    "apps.groups",
+{%- endif %}
 ]
 
 LOCAL_APPS = [
-    "{{ cookiecutter.project_slug }}.users.apps.UsersConfig",
+    "backend.users.apps.UsersConfig",
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -102,7 +103,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 # MIGRATIONS
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#migration-modules
-MIGRATION_MODULES = {"sites": "{{ cookiecutter.project_slug }}.contrib.sites.migrations"}
+# MIGRATION_MODULES = {"sites": "backend.contrib.sites.migrations"} # pai
 
 # AUTHENTICATION
 # ------------------------------------------------------------------------------
@@ -211,7 +212,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
 
                 # pai
-                '{{cookiecutter.project_slug}}.context_processors.get_repository_rev',
+                'backend.context_processors.get_repository_rev',
             ],
         },
     }
@@ -295,10 +296,10 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#task-time-limit
 # TODO: set to whatever value is adequate in your circumstances
-CELERY_TASK_TIME_LIMIT = 5 * 60
+CELERY_TASK_TIME_LIMIT = env("CELERY_TASK_TIME_LIMIT", default=(5 * 60))
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#task-soft-time-limit
 # TODO: set to whatever value is adequate in your circumstances
-CELERY_TASK_SOFT_TIME_LIMIT = 60
+CELERY_TASK_SOFT_TIME_LIMIT = env("CELERY_TASK_SOFT_TIME_LIMIT", default=60)
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#beat-scheduler
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
@@ -407,17 +408,37 @@ LOGGING['django_sso_app'] = {
 }
 {%- endif %}
 
+
 # djangorestframework
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
+if DEBUG:
+    DRF_DEFAULT_AUTHENTICATION_CLASSES = (
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
-    ],
-
+        'django_sso_app.authentication.DjangoSsoAppAuthentication'
+    )
+else:
+    DRF_DEFAULT_AUTHENTICATION_CLASSES = (
+        'rest_framework.authentication.TokenAuthentication',
+        'django_sso_app.authentication.DjangoSsoAppAuthentication'
+    )
+ 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': DRF_DEFAULT_AUTHENTICATION_CLASSES,
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 100,
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+
+    'DATETIME_FORMAT': '%Y-%m-%dT%H:%M:%S%z',
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    )
 }
+
 
 # swagger
 
