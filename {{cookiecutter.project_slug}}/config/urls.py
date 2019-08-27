@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.views.decorators.http import last_modified
 from django.views.i18n import JavaScriptCatalog
 
-from backend.views import SwaggerSchemaView, APIRoot, StatsView
+from backend.views import SwaggerSchemaView, APIRoot, StatsView, SSOAPIRoot
 
 from apps.profiles.urls import urlpatterns as profiles_urls
 from apps.groups.urls import urlpatterns as groups_urls
@@ -70,18 +70,22 @@ if settings.DEBUG:
         urlpatterns = [path("__debug__/", include(debug_toolbar.urls))] + urlpatterns
 
 # pai
-api_urlpatterns = [
+sso_auth_urlpatterns = [
+    url(r'^api/v1/auth/profiles/', include((profiles_urls, 'profiles'), namespace="profile")),
+    url(r'^api/v1/auth/groups/', include((groups_urls, 'groups'), namespace="group")),
+]
+
+api_urlpatterns = sso_auth_urlpatterns + [
     url(r'^api/v1/_stats/$', StatsView.as_view(), name="stats"),
 
-    url(r'^api/v1/profiles/', include((profiles_urls, 'profiles'), namespace="profile")),
-    url(r'^api/v1/groups/', include((groups_urls, 'groups'), namespace="group")),
-
-    # custom API urls here
+    url(r'^api/v1/fisherman/', include((fisherman_urls, "fisherman"), namespace="fisherman")),
 ]
 
 urlpatterns += api_urlpatterns
 
 urlpatterns += [
+    url(r'^api/v1/auth/', SSOAPIRoot.as_view(), name='ssoauth'),
+
     url(r'^api/v1/ui/$', APIRoot.as_view(), name="root"),
     url(r'^api/v1/$', SwaggerSchemaView.as_view(patterns=api_urlpatterns), name="swagger")
 ]
