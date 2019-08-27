@@ -2,7 +2,7 @@ DOCKER=docker
 DPATH=${CURDIR}
 
 IMAGE_NAME={{ cookiecutter.project_slug|replace('_', '-') }}
-VERSION=0.0.0
+VERSION={{ cookiecutter.version }}
 
 
 export DPATH
