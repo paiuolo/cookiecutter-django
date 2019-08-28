@@ -170,7 +170,7 @@ MIDDLEWARE = [
 ]
 # pai
 if DJANGO_SSO_ENABLED:
-    MIDLEWARE.append('django_sso_app.middleware.SsoMiddleware')
+    MIDDLEWARE.append('django_sso_app.middleware.SsoMiddleware')
 
 MIDDLEWARE += [
     "django.contrib.messages.middleware.MessageMiddleware",
