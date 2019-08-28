@@ -345,9 +345,9 @@ if DJANGO_ALLAUTH_ENABLED:
     # https://django-allauth.readthedocs.io/en/latest/configuration.html
     ACCOUNT_EMAIL_VERIFICATION = "mandatory"
     # https://django-allauth.readthedocs.io/en/latest/configuration.html
-    ACCOUNT_ADAPTER = "{{cookiecutter.project_slug}}.users.adapters.AccountAdapter"
+    ACCOUNT_ADAPTER = "backend.users.adapters.AccountAdapter"
     # https://django-allauth.readthedocs.io/en/latest/configuration.html
-    SOCIALACCOUNT_ADAPTER = "{{cookiecutter.project_slug}}.users.adapters.SocialAccountAdapter"
+    SOCIALACCOUNT_ADAPTER = "backend.users.adapters.SocialAccountAdapter"
 
 {% if cookiecutter.use_compressor == 'y' -%}
 # django-compressor
@@ -429,7 +429,7 @@ DRF_DEFAULT_AUTHENTICATION_CLASSES = [
 ]
 
 if DJANGO_SSO_ENABLED:
-    DRF_DEFAULT_AUTHENTICATION_CLASSE.append('django_sso_app.authentication.DjangoSsoAppAuthentication')
+    DRF_DEFAULT_AUTHENTICATION_CLASSES.append('django_sso_app.authentication.DjangoSsoAppAuthentication')
 
 
 REST_FRAMEWORK = {
