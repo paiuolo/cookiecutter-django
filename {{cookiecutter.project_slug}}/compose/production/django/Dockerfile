@@ -82,9 +82,9 @@ RUN sed -i 's/\r$//g' /start-supervisor
 RUN chmod +x /start-supervisor
 
 RUN mkdir -p /app/deploy
-COPY ./deploy/nginx.conf.template /app/deploy/
-COPY ./deploy/supervisord.docker.conf /app/deploy/
-COPY deploy/supervisord.docker.conf /etc/supervisord.conf
+COPY ./compose/production/django/deploy/nginx.conf.template /app/deploy/
+COPY ./compose/production/django/deploy/supervisord.docker.conf /app/deploy/
+COPY ./compose/production/django/deploy/supervisord.docker.conf /etc/supervisord.conf
 
 RUN mkdir -p /var/log/supervisord/
 RUN chmod a+rwx /var/log/supervisord
