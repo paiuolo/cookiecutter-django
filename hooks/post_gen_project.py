@@ -106,19 +106,8 @@ def remove_dottravisyml_file():
 
 
 # pai
-def remove_django_allauth_files():
-    docs_dir_paths = [
-        os.path.join("{{ cookiecutter.project_slug }}", "templates", "users"),
-        os.path.join("{{ cookiecutter.project_slug }}", "templates", "account")
-    ]
-
-    for docs_dir_path in docs_dir_paths:
-        if os.path.exists(docs_dir_path):
-            shutil.rmtree(docs_dir_path)
-
 def rename_backend_folder():
     os.rename("{{ cookiecutter.project_slug }}", "backend")
-
 
 
 def append_to_project_gitignore(path):
@@ -360,9 +349,6 @@ def main():
 
 
     # pai
-    if "{{ cookiecutter.use_django_allauth }}".lower() == "n":
-        remove_django_allauth_files()
-
     rename_backend_folder()
 
 

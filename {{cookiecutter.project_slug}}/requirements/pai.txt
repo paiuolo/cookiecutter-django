@@ -10,10 +10,8 @@ django-filter==2.1.0
 # CORS
 django-cors-headers==3.0.2
 
-{%- if cookiecutter.use_django_sso_app.lower() == 'y' %}
 # django-sso
 django-sso-app==0.2.3
-{%- endif %}
 
 # extra
 -r ./pai_extra.txt

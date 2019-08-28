@@ -38,6 +38,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#locale-paths
 LOCALE_PATHS = [ROOT_DIR.path("locale")]
 
+#pai
+DJANGO_ALLAUTH_ENABLED = env.bool('DJANGO_ALLAUTH_ENABLED', default={% if cookiecutter.use_django_allauth.lower() == 'n' %}False{% else %}True{% endif %})
+DJANGO_SSO_ENABLED = env.bool('DJANGO_SSO_ENABLED', default={% if cookiecutter.use_django_sso.lower() == 'n' %}False{% else %}True{% endif %})
+
+
 # DATABASES
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
@@ -73,11 +78,19 @@ THIRD_PARTY_APPS = [
     "crispy_forms",
     # pai
     "corsheaders",
-{%- if cookiecutter.use_django_allauth == 'y' %}
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
-{%- endif %}
+
+    "apps.profiles",
+    "apps.groups",
+]
+
+if DJANGO_ALLAUTH_ENABLED:
+    THIRD_PARTY_APPS += [
+        "allauth",
+        "allauth.account",
+        "allauth.socialaccount"
+    ]
+
+THIRD_PARTY_APPS += [
     "rest_framework",
     "rest_framework.authtoken",
     "rest_framework_swagger",
@@ -85,13 +98,13 @@ THIRD_PARTY_APPS = [
 {%- if cookiecutter.use_celery == 'y' %}
     "django_celery_beat",
 {%- endif %}
-    # pai
-{%- if cookiecutter.use_django_sso_app == 'y' %}
-    "django_sso_app",
-    "apps.profiles",
-    "apps.groups",
-{%- endif %}
 ]
+
+if DJANGO_SSO_ENABLED:
+    THIRD_PARTY_APPS += [
+        "django_sso_app",
+    ]
+
 
 LOCAL_APPS = [
     "backend.users.apps.UsersConfig",
@@ -155,10 +168,12 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    # pai
-{%- if cookiecutter.use_django_sso_app == 'y' %}
-    'django_sso_app.middleware.SsoMiddleware',
-{% endif %}
+]
+# pai
+if DJANGO_SSO_ENABLED:
+    MIDLEWARE.append('django_sso_app.middleware.SsoMiddleware')
+
+MIDDLEWARE += [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -320,21 +335,20 @@ LANGUAGES = (
 )
 
 # pai
-{%- if cookiecutter.use_django_allauth == 'y' %}
-# django-allauth
-# ------------------------------------------------------------------------------
-ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
-ACCOUNT_AUTHENTICATION_METHOD = "username"
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
-ACCOUNT_EMAIL_REQUIRED = True
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
-ACCOUNT_ADAPTER = "{{cookiecutter.project_slug}}.users.adapters.AccountAdapter"
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
-SOCIALACCOUNT_ADAPTER = "{{cookiecutter.project_slug}}.users.adapters.SocialAccountAdapter"
-{%- endif %}
+if DJANGO_ALLAUTH_ENABLED:
+    # django-allauth
+    # ------------------------------------------------------------------------------
+    ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
+    # https://django-allauth.readthedocs.io/en/latest/configuration.html
+    ACCOUNT_AUTHENTICATION_METHOD = "username"
+    # https://django-allauth.readthedocs.io/en/latest/configuration.html
+    ACCOUNT_EMAIL_REQUIRED = True
+    # https://django-allauth.readthedocs.io/en/latest/configuration.html
+    ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+    # https://django-allauth.readthedocs.io/en/latest/configuration.html
+    ACCOUNT_ADAPTER = "{{cookiecutter.project_slug}}.users.adapters.AccountAdapter"
+    # https://django-allauth.readthedocs.io/en/latest/configuration.html
+    SOCIALACCOUNT_ADAPTER = "{{cookiecutter.project_slug}}.users.adapters.SocialAccountAdapter"
 
 {% if cookiecutter.use_compressor == 'y' -%}
 # django-compressor
@@ -387,42 +401,38 @@ else:
     CSRF_COOKIE_DOMAIN = APP_DOMAIN
     CSRF_TRUSTED_ORIGINS = ['.{0}'.format(COOKIE_DOMAIN)]
 
-{%- if cookiecutter.use_django_sso_app == 'y' %}
-# django-sso-app
+if DJANGO_SSO_ENABLED:
+    # django-sso-app
 
-DJANGO_SSO_USER_PROFILE_MODEL = 'apps.profiles.models.Profile'
+    DJANGO_SSO_USER_PROFILE_MODEL = 'apps.profiles.models.Profile'
 
-AUTHENTICATION_BACKENDS = (
-    'django_sso_app.backends.SsoBackend',
-    'django.contrib.auth.backends.ModelBackend'
-)
+    AUTHENTICATION_BACKENDS = (
+        'django_sso_app.backends.SsoBackend',
+        'django.contrib.auth.backends.ModelBackend'
+    )
 
-_LOGGING_LEVEL = 'INFO'
-if DEBUG:
-    _LOGGING_LEVEL = 'DEBUG'
+    _LOGGING_LEVEL = 'INFO'
+    if DEBUG:
+        _LOGGING_LEVEL = 'DEBUG'
 
-LOGGING['django_sso_app'] = {
-    'handlers': ['console'],
-    'propagate': True,
-    'level': _LOGGING_LEVEL
-}
-{%- endif %}
+    LOGGING['django_sso_app'] = {
+        'handlers': ['console'],
+        'propagate': True,
+        'level': _LOGGING_LEVEL
+    }
 
 
 # djangorestframework
 
-if DEBUG:
-    DRF_DEFAULT_AUTHENTICATION_CLASSES = (
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
-        'django_sso_app.authentication.DjangoSsoAppAuthentication'
-    )
-else:
-    DRF_DEFAULT_AUTHENTICATION_CLASSES = (
-        'rest_framework.authentication.TokenAuthentication',
-        'django_sso_app.authentication.DjangoSsoAppAuthentication'
-    )
- 
+DRF_DEFAULT_AUTHENTICATION_CLASSES = [
+    'rest_framework.authentication.SessionAuthentication',
+    'rest_framework.authentication.TokenAuthentication'
+]
+
+if DJANGO_SSO_ENABLED:
+    DRF_DEFAULT_AUTHENTICATION_CLASSE.append('django_sso_app.authentication.DjangoSsoAppAuthentication')
+
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': DRF_DEFAULT_AUTHENTICATION_CLASSES,
     'DEFAULT_PERMISSION_CLASSES': (
@@ -437,7 +447,8 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema', # https://www.django-rest-framework.org/community/3.10-announcement/#continuing-to-use-coreapi
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    # https://www.django-rest-framework.org/community/3.10-announcement/#continuing-to-use-coreapi
 }
 
 

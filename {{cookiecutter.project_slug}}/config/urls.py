@@ -33,15 +33,19 @@ urlpatterns = [
     url(r'^i18n/', include('django.conf.urls.i18n')),
     url(r'^jsi18n/$', last_modified(lambda req, **kw: last_modified_date)(JavaScriptCatalog.as_view()), js_info_dict,
         name='javascript-catalog'),
+]
 
-{%- if cookiecutter.use_django_allauth == 'y' %}
-    # User management
-    path("users/", include("{{ cookiecutter.project_slug }}.users.urls", namespace="users")),
-    path("accounts/", include("allauth.urls")),
-{%- endif %}
-    # Your stuff: custom urls includes go here
+if settings.DJANGO_ALLAUTH_ENABLED:
+    urlpatterns += [
+        # User management
+        path("users/", include("{{ cookiecutter.project_slug }}.users.urls", namespace="users")),
+        path("accounts/", include("allauth.urls")),
+]
 
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Your stuff: custom urls includes go here
+urlpatterns += []
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
     # This allows the error pages to be debugged during development, just visit
