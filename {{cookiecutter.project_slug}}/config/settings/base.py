@@ -78,9 +78,6 @@ THIRD_PARTY_APPS = [
     "crispy_forms",
     # pai
     "corsheaders",
-
-    "apps.profiles",
-    "apps.groups",
 ]
 
 if DJANGO_ALLAUTH_ENABLED:
@@ -109,6 +106,8 @@ if DJANGO_SSO_ENABLED:
 LOCAL_APPS = [
     "backend.users.apps.UsersConfig",
     # Your stuff: custom apps go here
+    "apps.profiles",
+    "apps.groups",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
