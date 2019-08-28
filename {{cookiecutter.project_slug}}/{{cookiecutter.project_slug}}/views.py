@@ -53,9 +53,9 @@ class StatsView(APIView):
             return Response(err_msg, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class SSOAPIRoot(APIView):
+class AuthAPIRoot(APIView):
     """
-    SSO API Root
+    Auth API Root
     """
     permission_classes = (AllowAny,)
 
@@ -66,7 +66,7 @@ class SSOAPIRoot(APIView):
                 'groups': reverse('groups:list', request=request, *args, **kwargs),
             })
         except:
-            logger.exception('Error getting sso-api-root')
+            logger.exception('Error getting auth-api-root')
 
 
 class APIRoot(APIView):
@@ -79,7 +79,7 @@ class APIRoot(APIView):
         try:
             return Response({
                 'stats': reverse('stats', request=request),
-                'auth': reverse('ssoauth', request=request, *args, **kwargs),
+                'auth': reverse('authapi', request=request, *args, **kwargs),
 
                 # add here
             })
