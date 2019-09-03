@@ -227,6 +227,7 @@ TEMPLATES = [
 
                 # pai
                 'backend.context_processors.get_repository_rev',
+                'backend.context_processors.get_auth_settings',
             ],
         },
     }
