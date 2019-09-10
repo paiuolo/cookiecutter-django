@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model, forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
-from django.conf import settings
+from django.conf import settings # pai
 
 User = get_user_model()
 
