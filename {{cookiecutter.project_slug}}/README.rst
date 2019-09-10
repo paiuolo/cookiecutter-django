@@ -1,6 +1,8 @@
 {{cookiecutter.project_name}}
 {{ '=' * cookiecutter.project_name|length }}
 
+This is alpha software and is under heavy development.
+
 {{cookiecutter.description}}
 
 .. image:: https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg

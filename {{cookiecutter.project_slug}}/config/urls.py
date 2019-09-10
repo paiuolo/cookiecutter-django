@@ -13,8 +13,8 @@ from django.views.i18n import JavaScriptCatalog
 
 from backend.views import SwaggerSchemaView, APIRoot, StatsView, AuthAPIRoot
 
-from apps.profiles.urls import urlpatterns as profiles_urls
-from apps.groups.urls import urlpatterns as groups_urls
+from django_sso_app.core.apps.profiles.urls import urlpatterns as profiles_urls
+from django_sso_app.core.apps.groups.urls import urlpatterns as groups_urls
 
 
 last_modified_date = timezone.now()
@@ -35,12 +35,15 @@ urlpatterns = [
         name='javascript-catalog'),
 ]
 
+urlpatterns += [
+    # User management
+    path("users/", include("backend.users.urls", namespace="users")),
+]
+
 if settings.DJANGO_ALLAUTH_ENABLED:
     urlpatterns += [
-        # User management
-        path("users/", include("{{ cookiecutter.project_slug }}.users.urls", namespace="users")),
         path("accounts/", include("allauth.urls")),
-]
+    ]
 
 # Your stuff: custom urls includes go here
 urlpatterns += []

@@ -170,7 +170,7 @@ MIDDLEWARE = [
 ]
 # pai
 if DJANGO_SSO_ENABLED:
-    MIDDLEWARE.append('django_sso_app.middleware.SsoMiddleware')
+    MIDDLEWARE.append('django_sso_app.app.middleware.SsoMiddleware')
 
 MIDDLEWARE += [
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -227,6 +227,7 @@ TEMPLATES = [
 
                 # pai
                 'backend.context_processors.get_repository_rev',
+                'backend.context_processors.get_auth_settings',
             ],
         },
     }
@@ -403,10 +404,10 @@ else:
 if DJANGO_SSO_ENABLED:
     # django-sso-app
 
-    DJANGO_SSO_USER_PROFILE_MODEL = 'apps.profiles.models.Profile'
+    DJANGO_SSO_USER_PROFILE_MODEL = 'django_sso_app.core.apps.profiles.models.Profile'
 
     AUTHENTICATION_BACKENDS = (
-        'django_sso_app.backends.SsoBackend',
+        'django_sso_app.app.backends.SsoBackend',
         'django.contrib.auth.backends.ModelBackend'
     )
 
@@ -414,7 +415,7 @@ if DJANGO_SSO_ENABLED:
     if DEBUG:
         _LOGGING_LEVEL = 'DEBUG'
 
-    LOGGING['django_sso_app'] = {
+    LOGGING['profiles'] = {
         'handlers': ['console'],
         'propagate': True,
         'level': _LOGGING_LEVEL
@@ -429,7 +430,7 @@ DRF_DEFAULT_AUTHENTICATION_CLASSES = [
 ]
 
 if DJANGO_SSO_ENABLED:
-    DRF_DEFAULT_AUTHENTICATION_CLASSES.append('django_sso_app.authentication.DjangoSsoAppAuthentication')
+    DRF_DEFAULT_AUTHENTICATION_CLASSES.append('django_sso_app.app.authentication.DjangoSsoAppAuthentication')
 
 
 REST_FRAMEWORK = {

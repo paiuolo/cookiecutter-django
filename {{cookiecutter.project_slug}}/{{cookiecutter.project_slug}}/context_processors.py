@@ -11,3 +11,8 @@ def get_repository_rev(request):
     return {
         "REPOSITORY_REV": settings.REPOSITORY_REV
     }
+
+def get_auth_settings(request):
+    return {
+        "DJANGO_ALLAUTH_ENABLED": settings.DJANGO_ALLAUTH_ENABLED
+    }
