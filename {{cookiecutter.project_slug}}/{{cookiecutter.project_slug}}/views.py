@@ -1,6 +1,8 @@
 import logging
 import os
 
+from django.conf import settings
+
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
@@ -10,8 +12,21 @@ from rest_framework import status
 
 from rest_framework_swagger import renderers
 
-logger = logging.getLogger('django')
+logger = logging.getLogger('backend')
 CURRENT_DIR = os.getcwd()
+
+
+if platform.system() == 'Windows':
+    def local_space_available(dir):
+        """Return space available on local filesystem."""
+        import ctypes
+        free_bytes = ctypes.c_ulonglong(0)
+        ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(dir), None, None, ctypes.pointer(free_bytes))
+        return free_bytes.value
+else:
+    def local_space_available(dir):
+        destination_stats = os.statvfs(dir)
+        return destination_stats.f_bsize * destination_stats.f_bavail
 
 
 class StatsView(APIView):
@@ -23,9 +38,10 @@ class StatsView(APIView):
 
     def get(self, request):
         try:
-            stats = os.statvfs(CURRENT_DIR)
-            free_space_mb = int(
-                (stats.f_bavail * stats.f_frsize) / (1024 * 1024))
+            #stats = os.statvfs(CURRENT_DIR)
+            free_space_mb = int(local_space_available(CURRENT_DIR) / (1024 * 1024))
+            # free_space_mb = int(
+            #     (stats.f_bavail * stats.f_frsize) / (1024 * 1024))
 
             logger.info(
                 'Free space (MB): {}.'.format(free_space_mb))
@@ -53,22 +69,6 @@ class StatsView(APIView):
             return Response(err_msg, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class AuthAPIRoot(APIView):
-    """
-    Auth API Root
-    """
-    permission_classes = (AllowAny,)
-
-    def get(self, request, *args, **kwargs):
-        try:
-            return Response({
-                'profiles': reverse('profiles:list', request=request, *args, **kwargs),
-                'groups': reverse('groups:list', request=request, *args, **kwargs),
-            })
-        except:
-            logger.exception('Error getting auth-api-root')
-
-
 class APIRoot(APIView):
     """
     API Root
@@ -77,12 +77,15 @@ class APIRoot(APIView):
 
     def get(self, request, *args, **kwargs):
         try:
-            return Response({
+            patterns = {
                 'stats': reverse('stats', request=request),
-                'auth': reverse('authapi', request=request, *args, **kwargs),
-
-                # add here
-            })
+            }
+            if settings.DJANGO_SSO_BACKEND_ENABLED:
+                patterns['auth'] = reverse('authapi', request=request, *args, **kwargs)
+                patterns['profiles'] = reverse('profiles:list', request=request, *args, **kwargs)
+            elif settings.DJANGO_SSO_APP_ENABLED:
+                patterns['profiles'] = reverse('profiles:list', request=request, *args, **kwargs)
+            return Response(patterns)
         except:
             logger.exception('Error getting api-root')
 
