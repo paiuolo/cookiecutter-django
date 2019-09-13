@@ -103,6 +103,13 @@ api_urlpatterns += [
     # your api here
 ]
 
+if settings.DJANGO_SSO_APP_ENABLED and settings.DJANGO_SSO_APP_HAS_CUSTOM_USER_PROFILE:
+    from backend.profiles.urls import urlpatterns as profiles_urls
+    api_urlpatterns += [
+        url(r'^api/v1/auth/profiles/', include((profiles_urls, 'profiles'), namespace="profile")),
+        # your api here
+    ]
+
 urlpatterns += api_urlpatterns
 
 urlpatterns += [
