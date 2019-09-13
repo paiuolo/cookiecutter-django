@@ -11,7 +11,7 @@ django-filter==2.1.0
 django-cors-headers==3.0.2
 
 # django-sso-app
-django-sso-app==0.3.10
+django-sso-app==0.3.11
 
 # extra
 -r ./pai_extra.txt
