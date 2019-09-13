@@ -17,18 +17,16 @@ ROOT_DIR = (
 )  # ({{ cookiecutter.project_slug }}/config/settings/base.py - 3 = {{ cookiecutter.project_slug }}/)
 APPS_DIR = ROOT_DIR.path("backend")
 
+READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
+if READ_DOT_ENV_FILE:
+    # OS environment variables take precedence over variables from .env
+    env.read_env(str(ROOT_DIR.path(".env")))
+
+
 # django-sso-app
 DJANGO_SSO_APP_SERVER = False
 DJANGO_SSO_BACKEND_ENABLED = env.bool('DJANGO_SSO_BACKEND_ENABLED', default=env.bool('DJANGO_SSO_ENABLED', default={% if cookiecutter.use_django_sso.lower() == 'n' %}False{% else %}True{% endif %}))
 DJANGO_SSO_APP_ENABLED = env.bool('DJANGO_SSO_APP_ENABLED', default=(not DJANGO_SSO_BACKEND_ENABLED))
-
-if DJANGO_SSO_BACKEND_ENABLED or DJANGO_SSO_APP_ENABLED:
-    from django_sso_app.core.settings import environ, env
-else:
-    READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
-    if READ_DOT_ENV_FILE:
-        # OS environment variables take precedence over variables from .env
-        env.read_env(str(ROOT_DIR.path(".env")))
 
 if DJANGO_SSO_BACKEND_ENABLED:
     from django_sso_app.core.settings.backend import *
