@@ -47,7 +47,7 @@ DEBUG = env.bool("DJANGO_DEBUG", False)
 # In Windows, this must be set to your system time zone.
 TIME_ZONE = env("DJANGO_TIME_ZONE", default="{{ cookiecutter.timezone }}") # pai
 # https://docs.djangoproject.com/en/dev/ref/settings/#language-code
-LANGUAGE_CODE = env("DJANGO_LANGUAGE_CODE", default="en-us") # pai
+LANGUAGE_CODE = env("DJANGO_LANGUAGE_CODE", default="en-gb") # pai
 # https://docs.djangoproject.com/en/dev/ref/settings/#site-id
 SITE_ID = env.int("DJANGO_SITE_ID", default=1) # pai
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-i18n
@@ -111,9 +111,11 @@ THIRD_PARTY_APPS += [
 {%- endif %}
 ]
 
-if DJANGO_SSO_ENABLED:
+if DJANGO_ALLAUTH_ENABLED or DJANGO_SSO_BACKEND_ENABLED:
     THIRD_PARTY_APPS += [
-        "django_sso_app",
+        "allauth",
+        "allauth.account",
+        "allauth.socialaccount"
     ]
 
 
@@ -356,7 +358,7 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 LANGUAGES = (
     ## Customize this
     ('it', gettext('it')),
-    ('en', gettext('en')),
+    ('en-gb', gettext('en')),
     ('es', gettext('es')),
     ('pt', gettext('pt')),
     ('fr', gettext('fr')),
@@ -369,7 +371,7 @@ if DJANGO_ALLAUTH_ENABLED:
     # ------------------------------------------------------------------------------
     ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
     # https://django-allauth.readthedocs.io/en/latest/configuration.html
-    ACCOUNT_AUTHENTICATION_METHOD = "username_email"
+    ACCOUNT_AUTHENTICATION_METHOD = "username_email" # pai
     # https://django-allauth.readthedocs.io/en/latest/configuration.html
     ACCOUNT_EMAIL_REQUIRED = True
     # https://django-allauth.readthedocs.io/en/latest/configuration.html

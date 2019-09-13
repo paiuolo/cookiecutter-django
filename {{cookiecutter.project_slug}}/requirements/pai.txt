@@ -10,7 +10,7 @@ django-filter==2.1.0
 # CORS
 django-cors-headers==3.0.2
 
-# django-sso
+# django-sso-app
 django-sso-app==0.3.10
 
 # extra
