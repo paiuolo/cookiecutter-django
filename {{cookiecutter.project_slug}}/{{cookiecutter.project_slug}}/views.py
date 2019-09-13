@@ -78,7 +78,7 @@ class APIRoot(APIView):
     def get(self, request, *args, **kwargs):
         try:
             patterns = {
-                'stats': reverse('stats', request=request),
+                '_stats': reverse('stats', request=request),
             }
             if settings.DJANGO_SSO_BACKEND_ENABLED:
                 patterns['auth'] = reverse('authapi', request=request, *args, **kwargs)
