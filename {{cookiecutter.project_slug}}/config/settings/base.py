@@ -24,9 +24,11 @@ if READ_DOT_ENV_FILE:
 
 
 # django-sso-app
+DJANGO_ALLAUTH_ENABLED = env.bool('DJANGO_ALLAUTH_ENABLED', default={% if cookiecutter.use_django_allauth.lower() == 'n' %}False{% else %}True{% endif %})
+
 DJANGO_SSO_APP_SERVER = False
 DJANGO_SSO_BACKEND_ENABLED = env.bool('DJANGO_SSO_BACKEND_ENABLED', default=env.bool('DJANGO_SSO_ENABLED', default={% if cookiecutter.use_django_sso.lower() == 'n' %}False{% else %}True{% endif %}))
-DJANGO_SSO_APP_ENABLED = env.bool('DJANGO_SSO_APP_ENABLED', default=(not DJANGO_SSO_BACKEND_ENABLED))
+DJANGO_SSO_APP_ENABLED = env.bool('DJANGO_SSO_APP_ENABLED', default=(not DJANGO_SSO_BACKEND_ENABLED and not DJANGO_ALLAUTH_ENABLED))
 
 if DJANGO_SSO_BACKEND_ENABLED:
     from django_sso_app.core.settings.backend import *
@@ -59,7 +61,6 @@ LOCALE_PATHS = [ROOT_DIR.path("locale")]
 
 #pai
 TESTING_MODE = 'test' in sys.argv or DEBUG
-DJANGO_ALLAUTH_ENABLED = env.bool('DJANGO_ALLAUTH_ENABLED', default={% if cookiecutter.use_django_allauth.lower() == 'n' %}False{% else %}True{% endif %})
 
 # DATABASES
 # ------------------------------------------------------------------------------
