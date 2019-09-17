@@ -1,5 +1,6 @@
 import logging
 import os
+import platform
 
 from django.conf import settings
 
@@ -99,7 +100,7 @@ class SwaggerSchemaView(APIView):
         renderers.OpenAPIRenderer,
         renderers.SwaggerUIRenderer
     )
-    title = 'Django Fisherman'
+    title = 'Django'
     patterns = []
 
     def get(self, request):
