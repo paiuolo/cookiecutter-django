@@ -65,14 +65,23 @@ TESTING_MODE = 'test' in sys.argv or DEBUG
 # DATABASES
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(ROOT_DIR, 'db.sqlite3'),
+        }
+    }
+else:
 {% if cookiecutter.use_docker == "y" -%}
-DATABASES = {"default": env.db("DATABASE_URL")}
+    DATABASES = {"default": env.db("DATABASE_URL")}
 {%- else %}
-DATABASES = {
-    "default": env.db("DATABASE_URL", default="postgres://{% if cookiecutter.windows == 'y' %}localhost{% endif %}/{{cookiecutter.project_slug}}")
-}
+    DATABASES = {
+        "default": env.db("DATABASE_URL", default="postgres://{% if cookiecutter.windows == 'y' %}localhost{% endif %}/{{cookiecutter.project_slug}}")
+    }
 {%- endif %}
-DATABASES["default"]["ATOMIC_REQUESTS"] = True
+    DATABASES["default"]["ATOMIC_REQUESTS"] = True
+
 
 # URLS
 # ------------------------------------------------------------------------------
@@ -456,6 +465,10 @@ DRF_DEFAULT_AUTHENTICATION_CLASSES = [
     # 'rest_framework.authentication.SessionAuthentication',
     'rest_framework.authentication.TokenAuthentication'
 ]
+if DEBUG:
+    DRF_DEFAULT_AUTHENTICATION_CLASSES = [
+        'rest_framework.authentication.SessionAuthentication',
+    ] + DRF_DEFAULT_AUTHENTICATION_CLASSES
 
 if DJANGO_SSO_BACKEND_ENABLED:
     DRF_DEFAULT_AUTHENTICATION_CLASSES += [

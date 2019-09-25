@@ -3,6 +3,8 @@ import os
 import platform
 
 from django.conf import settings
+from django.utils import translation
+from django.shortcuts import redirect
 
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
@@ -28,6 +30,12 @@ else:
     def local_space_available(dir):
         destination_stats = os.statvfs(dir)
         return destination_stats.f_bsize * destination_stats.f_bavail
+
+
+def set_language_from_url(request, user_language):
+    translation.activate(user_language)
+    request.session[translation.LANGUAGE_SESSION_KEY] = user_language
+    return redirect('/')
 
 
 class StatsView(APIView):

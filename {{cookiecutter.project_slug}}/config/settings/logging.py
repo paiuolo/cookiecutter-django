@@ -30,6 +30,11 @@ LOGGING = {
             'handlers': ['console'],
             'propagate': True,
         },
+        'groups': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': True,
+        },
         'profiles': {
             'level': 'DEBUG',
             'handlers': ['console'],

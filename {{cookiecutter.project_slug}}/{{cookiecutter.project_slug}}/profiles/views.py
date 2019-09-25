@@ -1,6 +1,8 @@
 import logging
 
-from django_sso_app.core.apps.profiles.views import ProfileViewSet as DjangoSSoAppProfileViewSet
+from django_sso_app.core.apps.profiles.views import (ProfileViewSet as DjangoSSoAppProfileViewSet,
+                                                     ProfileView as DjangoSSoAppProfileView,
+                                                     ProfileUpdateView as DjangoSSoAppProfileUpdateView)
 from django_sso_app.core.utils import get_profile_model
 
 from backend.permissions import is_staff
@@ -16,3 +18,11 @@ class ProfileViewSet(DjangoSSoAppProfileViewSet):
             return Profile.objects.all()
         else:
             return Profile.objects.filter(user=user)
+
+
+class ProfileView(DjangoSSoAppProfileView):
+    pass
+
+
+class ProfileUpdateView(DjangoSSoAppProfileUpdateView):
+    pass

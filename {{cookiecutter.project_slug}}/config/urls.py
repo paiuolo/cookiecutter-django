@@ -12,7 +12,8 @@ from django.utils import timezone
 from django.views.decorators.http import last_modified
 from django.views.i18n import JavaScriptCatalog
 
-from backend.views import SwaggerSchemaView, APIRoot, StatsView
+from backend.views import SwaggerSchemaView, APIRoot, StatsView, set_language_from_url
+from backend.profiles.views import ProfileView, ProfileUpdateView
 
 # django-sso-app
 if settings.DJANGO_SSO_BACKEND_ENABLED:
@@ -36,10 +37,14 @@ urlpatterns = [
     # Django Admin, use {% raw %}{% url 'admin:index' %}{% endraw %}
     path(settings.ADMIN_URL, admin.site.urls),
 
+    path("profile/", ProfileView.as_view(), name="profile"),
+    url(r'^profile/update/$', ProfileUpdateView.as_view(), name='profile_update'),
+
     # pai
     url(r'^i18n/', include('django.conf.urls.i18n')),
     url(r'^jsi18n/$', last_modified(lambda req, **kw: last_modified_date)(JavaScriptCatalog.as_view()), js_info_dict,
         name='javascript-catalog'),
+    url(r'^set_language/(?P<user_language>\w+)/$', set_language_from_url, name="set_language_from_url"),
 ]
 
 # pai
@@ -118,10 +123,3 @@ urlpatterns += [
 
     # add there
 ]
-
--"""
--if settings.DJANGO_SSO_BACKEND_ENABLED:
--    urlpatterns += [
--        url(r'^api/v1/auth/', AuthAPIRoot.as_view(), name='authapi'),
--    ]
--"""
