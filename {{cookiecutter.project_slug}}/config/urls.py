@@ -50,7 +50,9 @@ urlpatterns = [
 # pai
 api_urlpatterns = []
 if settings.DJANGO_SSO_BACKEND_ENABLED:
-    urlpatterns += allauth_urlpatterns
+    urlpatterns += [
+        path("accounts/", include('allauth.urls')),
+    ]
     api_urlpatterns += rest_auth_urlpatterns
 elif settings.DJANGO_ALLAUTH_ENABLED:
     urlpatterns += [

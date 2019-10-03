@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
                 ('address', models.TextField(blank=True, null=True, verbose_name='address')),
                 ('unsubscribed_at', models.DateTimeField(blank=True, null=True)),
                 ('language', models.CharField(blank=True, max_length=3, null=True)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='sso_app_profile', to=settings.AUTH_USER_MODEL, verbose_name='user')),
+                ('user', models.OneToOneField(null=True, blank=True, on_delete=django.db.models.deletion.CASCADE, related_name='sso_app_profile', to=settings.AUTH_USER_MODEL, verbose_name='user')),
             ],
             options={
                 'abstract': False,

@@ -13,8 +13,21 @@ User = get_user_model()
 
 class Profile(AbstractUserProfileModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE,
+                                null=True, blank=True,
                                 verbose_name=_("user"),
                                 related_name="sso_app_profile")
 
     def get_absolute_url(self):
         return reverse("profiles:detail", args=[self.sso_id])
+
+    @property
+    def username(self):
+        if self.user is not None:
+            return self.user.username
+        return None
+
+    @property
+    def email(self):
+        if self.user is not None:
+            return self.user.email
+        return None
