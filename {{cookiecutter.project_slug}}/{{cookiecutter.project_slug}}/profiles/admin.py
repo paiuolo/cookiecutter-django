@@ -1,6 +1,8 @@
 from django.contrib import admin
 
-from .models import Profile
+from django_sso_app.core.utils import get_profile_model
+
+Profile = get_profile_model()
 
 
 class ProfileAdmin(admin.ModelAdmin):
