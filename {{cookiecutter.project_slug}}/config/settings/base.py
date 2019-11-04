@@ -62,7 +62,7 @@ USE_TZ = True
 LOCALE_PATHS = [ROOT_DIR.path("locale")]
 
 #pai
-TESTING_MODE = 'test' in sys.argv or DEBUG
+TESTING_MODE = 'test' in sys.argv
 
 # DATABASES
 # ------------------------------------------------------------------------------
@@ -264,6 +264,7 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
+                "{{ cookiecutter.project_slug }}.utils.context_processors.settings_context"
 
                 # pai
                 'backend.context_processors.get_repository_rev',
