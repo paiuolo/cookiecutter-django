@@ -6,6 +6,8 @@ import os
 import sys
 import environ
 
+from . import extra
+
 os.environ.setdefault('DJANGO_SSO_APP_USER_PROFILE', 'backend.profiles')
 
 env = environ.Env()
@@ -47,7 +49,7 @@ DEBUG = env.bool("DJANGO_DEBUG", False)
 # In Windows, this must be set to your system time zone.
 TIME_ZONE = env("DJANGO_TIME_ZONE", default="{{ cookiecutter.timezone }}") # pai
 # https://docs.djangoproject.com/en/dev/ref/settings/#language-code
-LANGUAGE_CODE = env("DJANGO_LANGUAGE_CODE", default="en-gb") # pai
+LANGUAGE_CODE = env("DJANGO_LANGUAGE_CODE", default="en") # pai
 # https://docs.djangoproject.com/en/dev/ref/settings/#site-id
 SITE_ID = env.int("DJANGO_SITE_ID", default=1) # pai
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-i18n
@@ -131,7 +133,7 @@ LOCAL_APPS = [
     "backend.users.apps.UsersConfig",
     # Your stuff: custom apps go here
 
-]
+] + extra.EXTRA_APPS # pai
 
 # django-sso-app
 if DJANGO_SSO_BACKEND_ENABLED:
@@ -366,7 +368,7 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 LANGUAGES = (
     ## Customize this
     ('it', gettext('it')),
-    ('en-gb', gettext('en')),
+    ('en', gettext('en')),
     ('es', gettext('es')),
     ('pt', gettext('pt')),
     ('fr', gettext('fr')),
@@ -545,3 +547,5 @@ SWAGGER_SETTINGS = {
 
 
 # ------------------------------------------------------------------------------
+
+SESSION_COOKIE_SAMESITE = None # Safari 12 and chrome cross site
