@@ -1,4 +1,8 @@
 {
+  "_copy_without_render": [
+    "templates/pages/profile.html"
+  ],
+
   "project_name": "Django Fisherman",
   "project_slug": "{{ cookiecutter.project_name.lower()|replace(' ', '_')|replace('-', '_')|replace('.', '_')|trim() }}",
   "description": "It never runs out of fish..",
@@ -38,7 +42,7 @@
   "use_celery": "y",
   "use_mailhog": "n",
   "use_sentry": "y",
-  "use_whitenoise": "n",
+  "use_whitenoise": "y",
   "use_heroku": "n",
   "use_travisci": "n",
   "keep_local_envs_in_vcs": "y",
