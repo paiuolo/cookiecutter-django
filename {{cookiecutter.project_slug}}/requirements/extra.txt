@@ -1,6 +1,5 @@
 ipython
 
-django-crispy-forms==1.7.2  # https://github.com/django-crispy-forms/django-crispy-forms
 django-redis==4.10.0  # https://github.com/niwinz/django-redis
 
 # DRF
@@ -12,6 +11,3 @@ django-cors-headers==3.0.2
 
 # django-sso-app
 django-sso-app==0.3.21
-
-# extra
--r ./pai_extra.txt

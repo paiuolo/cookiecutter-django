@@ -23,7 +23,13 @@ RUN apk add libxslt-dev libxml2 libxml2-dev \
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements /requirements
-RUN pip install -r /requirements/local.txt
+RUN pip install --no-cache-dir -r /requirements/production.txt \
+    && rm -rf /requirements
+
+# pai
+COPY ./requirements /requirements
+RUN pip install --no-cache-dir -r /requirements/extra.txt \
+    && rm -rf /requirements
 
 COPY ./compose/production/django/entrypoint /entrypoint
 RUN sed -i 's/\r$//g' /entrypoint
