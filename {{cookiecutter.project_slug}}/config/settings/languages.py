@@ -1,3 +1,5 @@
+gettext = lambda s: s
+
 LANGUAGES = (
     ## Customize this
     ('it', gettext('it')),

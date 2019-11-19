@@ -27,7 +27,7 @@ class UserRelatedSerializer(serializers.Serializer):
     def get_user(self, obj):
         user = getattr(obj, 'user', None)
         if user is not None:
-            profile = getattr(user, 'profile', None)
+            profile = getattr(user, 'sso_app_profile', None)
             if profile is not None:
                 request = self.context['request']
                 reverse_url = profile.get_absolute_url()

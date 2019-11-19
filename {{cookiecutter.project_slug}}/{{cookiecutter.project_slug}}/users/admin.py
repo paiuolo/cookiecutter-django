@@ -8,17 +8,16 @@ from .forms import UserChangeForm, UserCreationForm
 User = get_user_model()
 
 
-if settings.DJANGO_SSO_BACKEND_ENABLED or settings.DJANGO_SSO_APP_ENABLED:
-    from django_sso_app.core.utils import get_profile_model
+if settings.DJANGO_SSO_APP_BACKEND_ENABLED or settings.DJANGO_SSO_APP_ENABLED:
+    from django_sso_app.core.apps.profiles.models import Profile
 
-    if settings.DJANGO_SSO_BACKEND_ENABLED:
-        _list_display = ["username", "email", "is_superuser", "sso_id", "sso_rev"]
-        _search_fields = ["username", "email", "sso_id"]
+    if settings.DJANGO_SSO_APP_BACKEND_ENABLED:
+        _list_display = ["username", "email", "is_superuser"]
+        _search_fields = ["username", "email",]
     elif settings.DJANGO_SSO_APP_ENABLED:
         _list_display = ["username", "email", "is_superuser"]
-        _search_fields = ["username", "email"]
+        _search_fields = ["username", "email",]
 
-    Profile = get_profile_model()
 
     class ProfileInline(admin.StackedInline):
         model = Profile

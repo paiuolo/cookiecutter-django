@@ -35,7 +35,7 @@ class UserCreationForm(forms.UserCreationForm):
     def __init__(self, *args, **kwargs):
         super(UserCreationForm, self).__init__(*args, **kwargs)
 
-        if settings.DJANGO_SSO_ENABLED:
+        if getattr(settings, 'DJANGO_SSO_APP_BACKEND_ENABLED', False):
             # removing unnecessary password fields
             self.fields['password1'].required = False
             self.fields['password2'].required = False
