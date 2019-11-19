@@ -6,9 +6,6 @@ import os
 import sys
 import environ
 
-from . import extra
-
-os.environ.setdefault('DJANGO_SSO_APP_USER_PROFILE', 'backend.profiles')
 
 env = environ.Env()
 gettext = lambda s: s
@@ -24,20 +21,26 @@ if READ_DOT_ENV_FILE:
     # OS environment variables take precedence over variables from .env
     env.read_env(str(ROOT_DIR.path(".env")))
 
-
 # django-sso-app
-DJANGO_ALLAUTH_ENABLED = env.bool('DJANGO_ALLAUTH_ENABLED', default={% if cookiecutter.use_django_allauth.lower() == 'n' %}False{% else %}True{% endif %})
+from django_sso_app.core.settings.apps import DJANGO_SSO_APP_CORE_APPS, \
+    DJANGO_SSO_APP_BACKEND_CORE_APPS
+from django_sso_app.core.settings.django.backends import DJANGO_SSO_APP_BACKEND_DJANGO_AUTHENTICATION_BACKENDS, \
+    DJANGO_SSO_APP_DJANGO_AUTHENTICATION_BACKENDS
+from django_sso_app.core.settings.restframework.backends import \
+    DJANGO_SSO_APP_BACKEND_RESTFRAMEWORK_AUTHENTICATION_BACKENDS, \
+    DJANGO_SSO_APP_RESTFRAMEWORK_AUTHENTICATION_BACKENDS
 
-DJANGO_SSO_APP_SERVER = False
-DJANGO_SSO_BACKEND_ENABLED = env.bool('DJANGO_SSO_BACKEND_ENABLED', default=env.bool('DJANGO_SSO_ENABLED', default={% if cookiecutter.use_django_sso.lower() == 'n' %}False{% else %}True{% endif %}))
-DJANGO_SSO_APP_ENABLED = env.bool('DJANGO_SSO_APP_ENABLED', default=(not DJANGO_SSO_BACKEND_ENABLED and not DJANGO_ALLAUTH_ENABLED))
 
-if DJANGO_SSO_BACKEND_ENABLED:
-    from django_sso_app.core.settings.backend import *
-    from django_sso_app.core.settings.app import *
-elif DJANGO_SSO_APP_ENABLED:
-    from django_sso_app.core.settings.app import *
+DJANGO_SSO_APP_SHAPE = env('DJANGO_SSO_APP_SHAPE', default='backend_only')
+DJANGO_SSO_APP_BACKEND_ENABLED = env.bool('DJANGO_SSO_APP_BACKEND_ENABLED',
+                                          default=DJANGO_SSO_APP_SHAPE.find('backend') > -1)
+DJANGO_SSO_APP_ENABLED = env.bool('DJANGO_SSO_APP_ENABLED', default=(not DJANGO_SSO_APP_BACKEND_ENABLED))
+DJANGO_SSO_APP_APIGATEWAY_ENABLED = env.bool('DJANGO_SSO_APP_APIGATEWAY_ENABLED',
+                                             default=DJANGO_SSO_APP_SHAPE.find('apigateway') > -1)
+DJANGO_SSO_APP_USER_FIELDS = tuple(env.list('DJANGO_SSO_APP_USER_FIELDS', default=['username', 'email']))
 
+
+from .extra import *
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -63,6 +66,7 @@ LOCALE_PATHS = [ROOT_DIR.path("locale")]
 
 #pai
 TESTING_MODE = 'test' in sys.argv
+DJANGO_ALLAUTH_ENABLED = env.bool('DJANGO_ALLAUTH_ENABLED', default=not DJANGO_SSO_APP_BACKEND_ENABLED)
 
 # DATABASES
 # ------------------------------------------------------------------------------
@@ -111,21 +115,24 @@ THIRD_PARTY_APPS = [
 ]
 
 THIRD_PARTY_APPS += [
-    "rest_framework",
-    "rest_framework.authtoken",
-    "rest_framework_swagger",
-
     "django_filters",
 {%- if cookiecutter.use_celery == 'y' %}
     "django_celery_beat",
 {%- endif %}
 ]
 
-if DJANGO_ALLAUTH_ENABLED or DJANGO_SSO_BACKEND_ENABLED:
+# django-sso-app
+if DJANGO_SSO_APP_BACKEND_ENABLED:
+    EXTRA_APPS += DJANGO_SSO_APP_BACKEND_CORE_APPS
+elif DJANGO_SSO_APP_ENABLED:
+    EXTRA_APPS += DJANGO_SSO_APP_CORE_APPS
+elif DJANGO_ALLAUTH_ENABLED:
     THIRD_PARTY_APPS += [
         "allauth",
         "allauth.account",
-        "allauth.socialaccount"
+
+        'allauth.socialaccount',
+        "allauth.socialaccount.providers.google",
     ]
 
 
@@ -133,16 +140,8 @@ LOCAL_APPS = [
     "backend.users.apps.UsersConfig",
     # Your stuff: custom apps go here
 
-] + extra.EXTRA_APPS # pai
+] + EXTRA_APPS # pai
 
-# django-sso-app
-if DJANGO_SSO_BACKEND_ENABLED:
-    LOCAL_APPS += [
-        "rest_auth",
-        "rest_auth.registration",
-    ] + DJANGO_SSO_BACKEND_CORE_APPS
-elif DJANGO_SSO_APP_ENABLED:
-    LOCAL_APPS += DJANGO_SSO_APP_CORE_APPS
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -158,11 +157,17 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
 ]
-# pai
-if DJANGO_ALLAUTH_ENABLED or DJANGO_SSO_BACKEND_ENABLED:
+
+# django-sso-app
+if DJANGO_SSO_APP_BACKEND_ENABLED:
+    AUTHENTICATION_BACKENDS += DJANGO_SSO_APP_BACKEND_DJANGO_AUTHENTICATION_BACKENDS
+elif DJANGO_SSO_APP_ENABLED:
+    AUTHENTICATION_BACKENDS += DJANGO_SSO_APP_DJANGO_AUTHENTICATION_BACKENDS
+elif DJANGO_ALLAUTH_ENABLED:
     AUTHENTICATION_BACKENDS += [
         "allauth.account.auth_backends.AuthenticationBackend",
     ]
+
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
 AUTH_USER_MODEL = "users.User"
@@ -366,6 +371,8 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 {%- endif %}
 
 # pai
+from .languages import LANGUAGES
+"""
 LANGUAGES = (
     ## Customize this
     ('it', gettext('it')),
@@ -375,35 +382,70 @@ LANGUAGES = (
     ('fr', gettext('fr')),
     ('de', gettext('de')),
 )
+"""
 
-# pai
-if DJANGO_ALLAUTH_ENABLED:
+# django-sso-app
+if DJANGO_SSO_APP_BACKEND_ENABLED:
     # django-allauth
     # ------------------------------------------------------------------------------
-    ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
+    # ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
+    ACCOUNT_ALLOW_REGISTRATION = True
+
     # https://django-allauth.readthedocs.io/en/latest/configuration.html
-    ACCOUNT_AUTHENTICATION_METHOD = "username_email" # pai
+    _ACCOUNT_AUTHENTICATION_METHOD = 'email'  # !
+    if 'username' in DJANGO_SSO_APP_USER_FIELDS:
+        _ACCOUNT_AUTHENTICATION_METHOD = 'username_' + _ACCOUNT_AUTHENTICATION_METHOD
+    ACCOUNT_AUTHENTICATION_METHOD = _ACCOUNT_AUTHENTICATION_METHOD
+
     # https://django-allauth.readthedocs.io/en/latest/configuration.html
-    ACCOUNT_EMAIL_REQUIRED = True
+    ACCOUNT_EMAIL_REQUIRED = 'email' in DJANGO_SSO_APP_USER_FIELDS
     # https://django-allauth.readthedocs.io/en/latest/configuration.html
     ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+
+    ACCOUNT_ADAPTER = "django_sso_app.core.apps.users.adapters.UserAdapter"
+    ACCOUNT_FORMS = {
+        'signup': 'django_sso_app.core.forms.SignupForm',
+        'login': 'django_sso_app.core.forms.LoginForm'
+    }
+
+    # https://django-allauth.readthedocs.iobackend/en/latest/configuration.html
     # https://django-allauth.readthedocs.io/en/latest/configuration.html
-    ACCOUNT_ADAPTER = "backend.users.adapters.AccountAdapter"
-    # https://django-allauth.readthedocs.io/en/latest/configuration.html
-    SOCIALACCOUNT_ADAPTER = "backend.users.adapters.SocialAccountAdapter"
-    # pai
+    # SOCIALACCOUNT_ADAPTER = "django_sso_app.backend.users.adapters.SocialAccountAdapter"
+
     ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-    ACCOUNT_USERNAME_REQUIRED = True
+
+    # ! ACCOUNT_USERNAME_REQUIRED = 'username' in DJANGO_SSO_APP_USER_FIELDS
+    ACCOUNT_USERNAME_REQUIRED = 'username' in DJANGO_SSO_APP_USER_FIELDS
+
     ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = False
     ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = LOGIN_URL
     ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = LOGIN_URL
     ACCOUNT_SESSION_REMEMBER = False
 
-if DJANGO_SSO_BACKEND_ENABLED:
-    ACCOUNT_ADAPTER = "django_sso_app.backend.adapters.UserAdapter"
-    ACCOUNT_FORMS = {
-        'signup': 'django_sso_app.backend.forms.SignupForm'
-    }
+elif DJANGO_ALLAUTH_ENABLED:
+    _ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+    # django-allauth
+    # ------------------------------------------------------------------------------
+    ACCOUNT_ALLOW_REGISTRATION = True
+    # https://django-allauth.readthedocs.io/en/latest/configuration.html
+    ACCOUNT_AUTHENTICATION_METHOD = _ACCOUNT_AUTHENTICATION_METHOD  # pai
+    # https://django-allauth.readthedocs.io/en/latest/configuration.html
+    ACCOUNT_EMAIL_REQUIRED = True
+    # https://django-allauth.readthedocs.io/en/latest/configuration.html
+    ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+    # https://django-allauth.readthedocs.iobackend/en/latest/configuration.html
+    ACCOUNT_ADAPTER = "django_sso_app.backend.users.adapters.AccountAdapter"
+    # https://django-allauth.readthedocs.io/en/latest/configuration.html
+    SOCIALACCOUNT_ADAPTER = "django_sso_app.backend.users.adapters.SocialAccountAdapter"
+    # pai
+    ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+    ACCOUNT_USERNAME_REQUIRED = True
+
+    ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = False
+    ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = LOGIN_URL
+    ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = LOGIN_URL
+    ACCOUNT_SESSION_REMEMBER = False
+
 
 {% if cookiecutter.use_compressor == 'y' -%}
 # django-compressor
@@ -434,6 +476,10 @@ APP_URL = ACCOUNT_DEFAULT_HTTP_PROTOCOL + '://' + APP_DOMAIN
 
 COOKIE_DOMAIN = env("COOKIE_DOMAIN", default=APP_DOMAIN)
 
+REPOSITORY_REV = env("REPOSITORY_REV", default=None)
+EMAILS_DOMAIN = env('EMAILS_DOMAIN', default=APP_DOMAIN)  # domain name specified in email templates
+EMAILS_SITE_NAME = env('EMAILS_SITE_NAME', default=EMAILS_DOMAIN)  # site name specified in email templates
+
 # cors
 if DEBUG:
     CORS_ORIGIN_ALLOW_ALL = True
@@ -456,11 +502,6 @@ else:
     CSRF_COOKIE_DOMAIN = APP_DOMAIN
     CSRF_TRUSTED_ORIGINS = ['.{0}'.format(COOKIE_DOMAIN)]
 
-# django-sso-app
-if DJANGO_SSO_BACKEND_ENABLED or DJANGO_SSO_APP_ENABLED:
-    AUTHENTICATION_BACKENDS = AUTHENTICATION_BACKENDS + [
-        'django_sso_app.app.backends.DjangoSsoAppBackend',
-    ]
 
 # djangorestframework
 
@@ -473,14 +514,11 @@ if DEBUG:
         'rest_framework.authentication.SessionAuthentication',
     ] + DRF_DEFAULT_AUTHENTICATION_CLASSES
 
-if DJANGO_SSO_BACKEND_ENABLED:
-    DRF_DEFAULT_AUTHENTICATION_CLASSES += [
-        'django_sso_app.backend.authentication.JWTAuthentication',
-    ]
+# django-sso-app
+if DJANGO_SSO_APP_BACKEND_ENABLED:
+    DRF_DEFAULT_AUTHENTICATION_CLASSES += DJANGO_SSO_APP_BACKEND_RESTFRAMEWORK_AUTHENTICATION_BACKENDS
 elif DJANGO_SSO_APP_ENABLED:
-    DRF_DEFAULT_AUTHENTICATION_CLASSES += [
-        'django_sso_app.app.authentication.DjangoSsoAppAuthentication',
-    ]
+    DRF_DEFAULT_AUTHENTICATION_CLASSES += DJANGO_SSO_APP_RESTFRAMEWORK_AUTHENTICATION_BACKENDS
 
 
 REST_FRAMEWORK = {
@@ -502,33 +540,17 @@ REST_FRAMEWORK = {
 }
 
 # rest_auth
-if DJANGO_SSO_BACKEND_ENABLED:
-    REST_USE_JWT = True
-    REST_AUTH_SERIALIZERS = {
-        'LOGIN_SERIALIZER': 'django_sso_app.backend.serializers.LoginSerializer',
-        'PASSWORD_RESET_SERIALIZER': 'django_sso_app.backend.serializers.PasswordResetSerializer',
-        'USER_DETAILS_SERIALIZER' : 'django_sso_app.core.apps.users.serializers.UserSerializer',
-    }
 
-    REST_AUTH_REGISTER_SERIALIZERS = {
-        'REGISTER_SERIALIZER': 'django_sso_app.backend.serializers.RegisterSerializer',
-    }
-
-    JWT_AUTH = {
-        'JWT_AUTH_COOKIE': 'jwt',
-
-        'JWT_PAYLOAD_HANDLER': 'django_sso_app.backend.handlers.jwt_payload_handler',
-        'JWT_AUTH_HEADER_PREFIX': 'Bearer',
-        'JWT_VERIFY': False,
-    }
+if DJANGO_SSO_APP_BACKEND_ENABLED:
+    from django_sso_app.core.settings.restframework.jwt import *
 
 
-    print('ROOT_DIR', ROOT_DIR, "INSTALLED_APPS", INSTALLED_APPS)
+print('ROOT_DIR', ROOT_DIR, 'INSTALLED_APPS', INSTALLED_APPS)
 
 
 # swagger
 SWAGGER_SETTINGS = {
-    'LOGIN_URL': '/admin/login/',
+    'LOGIN_URL': LOGIN_URL,
     'LOGOUT_URL': '/admin/logout/',
     'SECURITY_DEFINITIONS': {
         'JWT': {
@@ -548,5 +570,21 @@ SWAGGER_SETTINGS = {
 
 
 # ------------------------------------------------------------------------------
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_COOKIE_SAMESITE = None  # Safari 12 and chrome cross site
 
-SESSION_COOKIE_SAMESITE = None # Safari 12 and chrome cross site
+if DJANGO_SSO_APP_APIGATEWAY_ENABLED:
+    USE_X_FORWARDED_HOST = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}

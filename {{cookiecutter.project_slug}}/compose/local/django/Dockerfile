@@ -1,4 +1,4 @@
-FROM python:3.6-alpine
+FROM python:3.7-alpine
 
 ENV PYTHONUNBUFFERED 1
 
@@ -14,12 +14,6 @@ RUN apk update \
   && apk add gettext \
   # https://docs.djangoproject.com/en/dev/ref/django-admin/#dbshell
   && apk add postgresql-client
-
-
-# pai
-RUN apk add libxslt-dev libxml2 libxml2-dev \
-  && apk add nginx supervisor
-
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements /requirements

@@ -19,14 +19,14 @@ class DeactivableModel(models.Model):
     class Meta:
         abstract = True
 
-    is_active = models.BooleanField(_("is active"), default=True)
+    is_active = models.BooleanField(_('is active'), default=True)
 
 
 class CreatedAtModel(models.Model):
     class Meta:
         abstract = True
 
-    created_at = models.DateTimeField(_("created at"),
+    created_at = models.DateTimeField(_('created at'),
                                       editable=False,
                                       auto_now_add=True)
 
@@ -35,7 +35,7 @@ class UpdatableModel(models.Model):
     class Meta:
         abstract = True
 
-    updated_at = models.DateTimeField(_("updated at"),
+    updated_at = models.DateTimeField(_('updated at'),
                                       editable=False,
                                       null=True,
                                       blank=True)
@@ -51,20 +51,20 @@ class UserRelatedModel(models.Model):
         abstract = True
 
     user = models.ForeignKey(User, on_delete=models.CASCADE,
-                             verbose_name=_("user"))
+                             verbose_name=_('user'))
 
 
 class PublicableModel(models.Model):
     class Meta:
         abstract = True
 
-    is_public = models.BooleanField(default=False)
+    is_public = models.BooleanField(_('is public'), default=False)
 
 
 class TimespanModel(models.Model):
     class Meta:
         abstract = True
 
-    started_at = models.DateTimeField(_("started at"), null=True, blank=True)
+    started_at = models.DateTimeField(_('started at'), null=True, blank=True)
 
-    ended_at = models.DateTimeField(_("ended at"), null=True, blank=True)
+    ended_at = models.DateTimeField(_('ended at'), null=True, blank=True)

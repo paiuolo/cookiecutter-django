@@ -18,7 +18,7 @@ from .base import env
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["{{ cookiecutter.domain_name }}"])
+ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=[APP_DOMAIN])
 
 # DATABASES
 # ------------------------------------------------------------------------------
@@ -174,7 +174,7 @@ DEFAULT_FROM_EMAIL = env(
 SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-subject-prefix
 EMAIL_SUBJECT_PREFIX = env(
-    "DJANGO_EMAIL_SUBJECT_PREFIX", default="[{{cookiecutter.project_name}}]"
+    "DJANGO_EMAIL_SUBJECT_PREFIX", default="[{}]".format(APP_DOMAIN)
 )
 
 # ADMIN
@@ -186,12 +186,19 @@ ADMIN_URL = env("DJANGO_ADMIN_URL")
 # ------------------------------------------------------------------------------
 # https://anymail.readthedocs.io/en/stable/installation/#installing-anymail
 INSTALLED_APPS += ["anymail"]  # noqa F405
+"""
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 # https://anymail.readthedocs.io/en/stable/installation/#anymail-settings-reference
 ANYMAIL = {
     "MAILGUN_API_KEY": env("MAILGUN_API_KEY"),
     "MAILGUN_SENDER_DOMAIN": env("MAILGUN_DOMAIN"),
     "MAILGUN_API_URL": env("MAILGUN_API_URL", default="https://api.mailgun.net/v3"),
+}
+"""
+EMAIL_BACKEND = "anymail.backends.sendgrid.EmailBackend"
+# https://anymail.readthedocs.io/en/stable/installation/#anymail-settings-reference
+ANYMAIL = {
+    "SENDGRID_API_KEY": env("SENDGRID_API_KEY"),
 }
 
 {% if cookiecutter.use_whitenoise == 'y' -%}

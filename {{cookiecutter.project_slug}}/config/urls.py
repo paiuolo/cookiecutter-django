@@ -4,6 +4,7 @@ from django.conf.urls import url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView
+from django.views.generic.base import RedirectView
 from django.views import defaults as default_views
 from django.contrib.auth.decorators import login_required
 
@@ -15,13 +16,13 @@ from django.views.i18n import JavaScriptCatalog
 from backend.views import SwaggerSchemaView, APIRoot, StatsView, set_language_from_url
 from backend.profiles.views import ProfileView, ProfileUpdateView
 
-# django-sso-app
-if settings.DJANGO_SSO_BACKEND_ENABLED:
-    from django_sso_app.backend.config.urls.allauth import allauth_urlpatterns
-    from django_sso_app.backend.config.urls.rest_auth import rest_auth_urlpatterns
-    from django_sso_app.backend.config.urls.sso import sso_app_urlpatterns
-elif settings.DJANGO_SSO_APP_ENABLED:
-    from django_sso_app.backend.config.urls.sso import sso_app_urlpatterns
+from django_sso_app.core.settings.common import DJANGO_SSO_APP_BACKEND_ENABLED, DJANGO_SSO_APP_ENABLED
+if DJANGO_SSO_APP_BACKEND_ENABLED:
+    from django_sso_app.backend.settings import DJANGO_SSO_APP_BACKEND_STANDALONE
+    from django_sso_app.core.urls.django_sso_app import django_sso_app_urlpatterns
+    from django_sso_app.core.urls.django_sso_app import django_sso_app_api_urlpatterns
+elif DJANGO_SSO_APP_ENABLED:
+    from django_sso_app.core.urls.django_sso_app import django_sso_app_urlpatterns
 
 # add there
 
@@ -49,19 +50,6 @@ urlpatterns = [
 
 # pai
 api_urlpatterns = []
-if settings.DJANGO_SSO_BACKEND_ENABLED:
-    urlpatterns += [
-        path("accounts/", include('allauth.urls')),
-    ]
-    api_urlpatterns += rest_auth_urlpatterns
-elif settings.DJANGO_ALLAUTH_ENABLED:
-    urlpatterns += [
-        path("accounts/", include("allauth.urls")),
-        # ! add social
-    ]
-if settings.DJANGO_SSO_BACKEND_ENABLED or settings.DJANGO_SSO_APP_ENABLED:
-    api_urlpatterns += sso_app_urlpatterns
-
 
 # Your stuff: custom urls includes go here
 
@@ -110,11 +98,14 @@ api_urlpatterns += [
     # your api here
 ]
 
-if settings.DJANGO_SSO_APP_ENABLED and settings.DJANGO_SSO_APP_HAS_CUSTOM_USER_PROFILE:
-    from backend.profiles.urls import urlpatterns as profiles_urls
-    api_urlpatterns += [
-        url(r'^api/v1/profiles/', include((profiles_urls, 'profiles'), namespace="profile")),
-        # your api here
+# pai
+if DJANGO_SSO_APP_BACKEND_ENABLED or DJANGO_SSO_APP_ENABLED:
+    urlpatterns += django_sso_app_urlpatterns
+    api_urlpatterns += django_sso_app_api_urlpatterns
+elif settings.DJANGO_ALLAUTH_ENABLED:
+    urlpatterns += [
+        path("accounts/", include("allauth.urls")),
+        # ! add social
     ]
 
 urlpatterns += api_urlpatterns
@@ -125,3 +116,7 @@ urlpatterns += [
 
     # add there
 ]
+
+for lang, _name in settings.LANGUAGES:
+    urlpatterns.append(url(r'^{}/login/$'.format(lang), RedirectView.as_view(url='/login/', permanent=False)))
+    urlpatterns.append(url(r'^{}/signup/$'.format(lang), RedirectView.as_view(url='/signup/', permanent=False)))
