@@ -92,25 +92,6 @@ class StatsView(APIView):
             logger.exception('Error getting health {}'.format(err_msg))
             return Response(err_msg, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-class SwaggerSchemaView(APIView):
-    """
-    OpenAPI
-    """
-    permission_classes = (AllowAny,)
-    renderer_classes = (
-        renderers.OpenAPIRenderer,
-        renderers.SwaggerUIRenderer
-    )
-    title = 'Django'
-    patterns = []
-
-    def get(self, request):
-        generator = SchemaGenerator(title=self.title, patterns=self.patterns)
-        schema = generator.get_schema(request=request)
-
-        return Response(schema)
-
 """
 class SwaggerSchemaView(APIView):
     permission_classes = (AllowAny,)
