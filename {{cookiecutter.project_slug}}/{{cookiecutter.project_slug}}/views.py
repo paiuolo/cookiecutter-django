@@ -1,19 +1,23 @@
 import logging
+
 import os
 import platform
 
-from django.conf import settings
+from urllib.parse import urlsplit
 from django.utils import translation
 from django.shortcuts import redirect
 
-from rest_framework.response import Response
-from rest_framework.reverse import reverse
-from rest_framework.views import APIView
+from rest_framework.views import Response, status, APIView
 from rest_framework.permissions import AllowAny
+from rest_framework import permissions
+"""
 from rest_framework.schemas import SchemaGenerator
-from rest_framework import status
-
 from rest_framework_swagger import renderers
+from rest_framework.schemas.coreapi import AutoSchema
+"""
+
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
 
 logger = logging.getLogger('backend')
 CURRENT_DIR = os.getcwd()
@@ -33,9 +37,19 @@ else:
 
 
 def set_language_from_url(request, user_language):
+    prev_lang = request.session.get(translation.LANGUAGE_SESSION_KEY, request.LANGUAGE_CODE)
+
     translation.activate(user_language)
     request.session[translation.LANGUAGE_SESSION_KEY] = user_language
-    return redirect('/')
+
+    url = request.META.get('HTTP_REFERER', '/')
+    parsed = urlsplit(url)
+
+    _url = parsed.path
+    if len(_url) > 1:
+        _url = '/{}/'.format(user_language) + _url.lstrip('\/{}\/'.format(prev_lang))
+
+    return redirect(_url)
 
 
 class StatsView(APIView):
@@ -65,6 +79,7 @@ class StatsView(APIView):
 
             data = {
                 'status': health_status,
+                'meta': str(request.META.items())
             }
 
             if request.user is not None and request.user.is_staff:
@@ -76,27 +91,6 @@ class StatsView(APIView):
             err_msg = str(e)
             logger.exception('Error getting health {}'.format(err_msg))
             return Response(err_msg, status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-class APIRoot(APIView):
-    """
-    API Root
-    """
-    permission_classes = (AllowAny,)
-
-    def get(self, request, *args, **kwargs):
-        try:
-            patterns = {
-                '_stats': reverse('stats', request=request),
-            }
-            if settings.DJANGO_SSO_BACKEND_ENABLED:
-                patterns['auth'] = reverse('authapi', request=request, *args, **kwargs)
-                patterns['profiles'] = reverse('profiles:list', request=request, *args, **kwargs)
-            elif settings.DJANGO_SSO_APP_ENABLED:
-                patterns['profiles'] = reverse('profiles:list', request=request, *args, **kwargs)
-            return Response(patterns)
-        except:
-            logger.exception('Error getting api-root')
 
 
 class SwaggerSchemaView(APIView):
@@ -116,3 +110,41 @@ class SwaggerSchemaView(APIView):
         schema = generator.get_schema(request=request)
 
         return Response(schema)
+
+"""
+class SwaggerSchemaView(APIView):
+    permission_classes = (AllowAny,)
+    renderer_classes = (
+        renderers.OpenAPIRenderer,
+    )
+    title = 'Django SSO App'
+    default_version = 'v1'
+    patterns = []
+
+    def get(self, request):
+        generator = SchemaGenerator(title=self.title, patterns=self.patterns)
+        schema = generator.get_schema(request=request)
+
+        return Response(schema)
+"""
+
+"""
+from rest_framework.schemas import get_schema_view
+
+urlpatterns += [
+    #url(r'^api/v1/$', SwaggerSchemaView.as_view(patterns=api_urlpatterns), name="swagger")
+    url(r'^api/v1/$', get_schema_view(
+        title="Your Project",
+        description="API for all things …"
+    ), name='openapi-schema'),
+]
+"""
+
+schema_view = get_schema_view(
+   openapi.Info(
+      title="Django SSO App",
+      default_version='v1',
+   ),
+   public=True,
+   permission_classes=(permissions.AllowAny,),
+)

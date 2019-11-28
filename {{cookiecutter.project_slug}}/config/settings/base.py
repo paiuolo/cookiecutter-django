@@ -22,30 +22,21 @@ if READ_DOT_ENV_FILE:
     env.read_env(str(ROOT_DIR.path(".env")))
 
 # django-sso-app
-from django_sso_app.core.settings.apps import DJANGO_SSO_APP_CORE_APPS, \
-    DJANGO_SSO_APP_BACKEND_CORE_APPS
-from django_sso_app.core.settings.django.backends import DJANGO_SSO_APP_BACKEND_DJANGO_AUTHENTICATION_BACKENDS, \
-    DJANGO_SSO_APP_DJANGO_AUTHENTICATION_BACKENDS
-from django_sso_app.core.settings.restframework.backends import \
-    DJANGO_SSO_APP_BACKEND_RESTFRAMEWORK_AUTHENTICATION_BACKENDS, \
-    DJANGO_SSO_APP_RESTFRAMEWORK_AUTHENTICATION_BACKENDS
-
-
 DJANGO_SSO_APP_SHAPE = env('DJANGO_SSO_APP_SHAPE', default='backend_only')
-DJANGO_SSO_APP_BACKEND_ENABLED = env.bool('DJANGO_SSO_APP_BACKEND_ENABLED',
-                                          default=DJANGO_SSO_APP_SHAPE.find('backend') > -1)
+DJANGO_SSO_APP_BACKEND_ENABLED = env.bool('DJANGO_SSO_APP_BACKEND_ENABLED', default=DJANGO_SSO_APP_SHAPE.find('backend') > -1)
 DJANGO_SSO_APP_ENABLED = env.bool('DJANGO_SSO_APP_ENABLED', default=(not DJANGO_SSO_APP_BACKEND_ENABLED))
-DJANGO_SSO_APP_APIGATEWAY_ENABLED = env.bool('DJANGO_SSO_APP_APIGATEWAY_ENABLED',
-                                             default=DJANGO_SSO_APP_SHAPE.find('apigateway') > -1)
-DJANGO_SSO_APP_USER_FIELDS = tuple(env.list('DJANGO_SSO_APP_USER_FIELDS', default=['username', 'email']))
-
+DJANGO_SSO_APP_APIGATEWAY_ENABLED = env.bool('DJANGO_SSO_APP_APIGATEWAY_ENABLED', default=DJANGO_SSO_APP_SHAPE.find('apigateway') > -1)
+DJANGO_SSO_APP_USER_FIELDS = tuple(env.list('DJANGO_SSO_APP_USER_FIELDS', default=['username', 'email']))  # ['email']
+DJANGO_SSO_APP_REQUIRED_USER_FIELDS = tuple(env.list('DJANGO_SSO_APP_REQUIRED_USER_FIELDS', default=DJANGO_SSO_APP_USER_FIELDS))
+DJANGO_SSO_APP_BACKEND_FRONTEND_APP = env('DJANGO_SSO_APP_BACKEND_FRONTEND_APP', default=None)
 
 from .extra import *
+
 
 # GENERAL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#debug
-DEBUG = env.bool("DJANGO_DEBUG", False)
+DEBUG = env.bool("DJANGO_DEBUG", True)
 # Local time zone. Choices are
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # though not all of them may be available with every OS.
@@ -112,6 +103,8 @@ THIRD_PARTY_APPS = [
     "crispy_forms",
     # pai
     "corsheaders",
+
+    "meta",
 ]
 
 THIRD_PARTY_APPS += [
@@ -123,9 +116,13 @@ THIRD_PARTY_APPS += [
 
 # django-sso-app
 if DJANGO_SSO_APP_BACKEND_ENABLED:
-    EXTRA_APPS += DJANGO_SSO_APP_BACKEND_CORE_APPS
+    from django_sso_app.backend.settings.django import DJANGO_SSO_APP_BACKEND_CORE_APPS
+    THIRD_PARTY_APPS += DJANGO_SSO_APP_BACKEND_CORE_APPS
+    if DJANGO_SSO_APP_BACKEND_FRONTEND_APP is not None:
+        THIRD_PARTY_APPS += [DJANGO_SSO_APP_BACKEND_FRONTEND_APP]
 elif DJANGO_SSO_APP_ENABLED:
-    EXTRA_APPS += DJANGO_SSO_APP_CORE_APPS
+    from django_sso_app.app.settings.django import DJANGO_SSO_APP_CORE_APPS
+    THIRD_PARTY_APPS += DJANGO_SSO_APP_CORE_APPS
 elif DJANGO_ALLAUTH_ENABLED:
     THIRD_PARTY_APPS += [
         "allauth",
@@ -160,19 +157,20 @@ AUTHENTICATION_BACKENDS = [
 
 # django-sso-app
 if DJANGO_SSO_APP_BACKEND_ENABLED:
+    from django_sso_app.backend.settings.django import DJANGO_SSO_APP_BACKEND_DJANGO_AUTHENTICATION_BACKENDS
     AUTHENTICATION_BACKENDS += DJANGO_SSO_APP_BACKEND_DJANGO_AUTHENTICATION_BACKENDS
 elif DJANGO_SSO_APP_ENABLED:
+    from django_sso_app.app.settings.django import DJANGO_SSO_APP_DJANGO_AUTHENTICATION_BACKENDS
     AUTHENTICATION_BACKENDS += DJANGO_SSO_APP_DJANGO_AUTHENTICATION_BACKENDS
 elif DJANGO_ALLAUTH_ENABLED:
     AUTHENTICATION_BACKENDS += [
         "allauth.account.auth_backends.AuthenticationBackend",
     ]
 
-
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
 AUTH_USER_MODEL = "users.User"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
-LOGIN_REDIRECT_URL = "users:redirect"
+LOGIN_REDIRECT_URL = "/"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
 LOGIN_URL = "account_login"
 
@@ -211,11 +209,13 @@ MIDDLEWARE = [
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
+
     "django.contrib.auth.middleware.AuthenticationMiddleware",
 ]
-# pai
-if DJANGO_SSO_APP_ENABLED:
-    MIDDLEWARE.append('django_sso_app.app.middleware.DjangoSsoAppMiddleware')
+
+# django-sso-app
+if DJANGO_SSO_APP_BACKEND_ENABLED or DJANGO_SSO_APP_ENABLED:
+    MIDDLEWARE += ['django_sso_app.core.middleware.DjangoSsoAppAuthenticationMiddleware']
 
 MIDDLEWARE += [
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -224,8 +224,16 @@ MIDDLEWARE += [
 
 # STATIC
 # ------------------------------------------------------------------------------
+_ENV_PUBLIC_ROOT = env('DJANGO_PUBLIC_ROOT', default=None)
+if _ENV_PUBLIC_ROOT is None:
+    PUBLIC_ROOT = ROOT_DIR.path("public")
+else:
+    PUBLIC_ROOT = environ.Path(_ENV_PUBLIC_ROOT)
+
+
+PUBLIC_ROOT = ROOT_DIR.path("public")  # pai
 # https://docs.djangoproject.com/en/dev/ref/settings/#static-root
-STATIC_ROOT = str(ROOT_DIR("staticfiles"))
+STATIC_ROOT = str(PUBLIC_ROOT.path("static"))  # pai
 # https://docs.djangoproject.com/en/dev/ref/settings/#static-url
 STATIC_URL = "/static/"
 # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
@@ -239,7 +247,7 @@ STATICFILES_FINDERS = [
 # MEDIA
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#media-root
-MEDIA_ROOT = str(APPS_DIR("media"))
+MEDIA_ROOT = str(PUBLIC_ROOT.path("media"))  # pai
 # https://docs.djangoproject.com/en/dev/ref/settings/#media-url
 MEDIA_URL = "/media/"
 
@@ -252,6 +260,7 @@ TEMPLATES = [
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         # https://docs.djangoproject.com/en/dev/ref/settings/#template-dirs
         "DIRS": [str(APPS_DIR.path("templates"))],
+        # 'APP_DIRS': True,
         "OPTIONS": {
             # https://docs.djangoproject.com/en/dev/ref/settings/#template-loaders
             # https://docs.djangoproject.com/en/dev/ref/templates/api/#loader-types
@@ -270,11 +279,10 @@ TEMPLATES = [
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
 
-                "backend.utils.context_processors.settings_context",
-
                 # pai
-                'backend.context_processors.get_repository_rev',
-                'backend.context_processors.get_auth_settings',
+                'django_sso_app.backend.context_processors.get_repository_rev',
+                'django_sso_app.backend.context_processors.get_auth_settings',
+                'django_sso_app.backend.context_processors.get_meta_info',
             ],
         },
     }
@@ -372,7 +380,7 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 {%- endif %}
 
 # pai
-from .languages import LANGUAGES
+from .languages import *
 """
 LANGUAGES = (
     ## Customize this
@@ -401,9 +409,9 @@ if DJANGO_SSO_APP_BACKEND_ENABLED:
     # https://django-allauth.readthedocs.io/en/latest/configuration.html
     ACCOUNT_EMAIL_REQUIRED = 'email' in DJANGO_SSO_APP_USER_FIELDS
     # https://django-allauth.readthedocs.io/en/latest/configuration.html
-    ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+    ACCOUNT_EMAIL_VERIFICATION = "mandatory" if ACCOUNT_EMAIL_REQUIRED else "optional"  # "none"
 
-    ACCOUNT_ADAPTER = "django_sso_app.core.apps.users.adapters.UserAdapter"
+    ACCOUNT_ADAPTER = "django_sso_app.core.adapter.AccountAdapter"
     ACCOUNT_FORMS = {
         'signup': 'django_sso_app.core.forms.SignupForm',
         'login': 'django_sso_app.core.forms.LoginForm'
@@ -420,8 +428,23 @@ if DJANGO_SSO_APP_BACKEND_ENABLED:
 
     ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = False
     ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = LOGIN_URL
-    ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = LOGIN_URL
+    ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/'
     ACCOUNT_SESSION_REMEMBER = False
+
+    SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+    SESSION_COOKIE_SAMESITE = None # Safari 12 and chrome cross site
+
+    SOCIALACCOUNT_PROVIDERS = {
+        'google': {
+            'SCOPE': [
+                'profile',
+                'email',
+            ],
+            'AUTH_PARAMS': {
+                'access_type': 'online',
+            }
+        }
+    }
 
 elif DJANGO_ALLAUTH_ENABLED:
     _ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
@@ -429,7 +452,7 @@ elif DJANGO_ALLAUTH_ENABLED:
     # ------------------------------------------------------------------------------
     ACCOUNT_ALLOW_REGISTRATION = True
     # https://django-allauth.readthedocs.io/en/latest/configuration.html
-    ACCOUNT_AUTHENTICATION_METHOD = _ACCOUNT_AUTHENTICATION_METHOD  # pai
+    ACCOUNT_AUTHENTICATION_METHOD = _ACCOUNT_AUTHENTICATION_METHOD # pai
     # https://django-allauth.readthedocs.io/en/latest/configuration.html
     ACCOUNT_EMAIL_REQUIRED = True
     # https://django-allauth.readthedocs.io/en/latest/configuration.html
@@ -444,8 +467,9 @@ elif DJANGO_ALLAUTH_ENABLED:
 
     ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = False
     ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = LOGIN_URL
-    ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = LOGIN_URL
+    ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/'
     ACCOUNT_SESSION_REMEMBER = False
+
 
 
 {% if cookiecutter.use_compressor == 'y' -%}
@@ -458,6 +482,9 @@ STATICFILES_FINDERS += ["compressor.finders.CompressorFinder"]
 # Your stuff...
 
 # pai
+if DJANGO_SSO_APP_APIGATEWAY_ENABLED:
+    USE_X_FORWARDED_HOST = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 REPOSITORY_REV = env("REPOSITORY_REV", default=None)
 
@@ -516,10 +543,8 @@ if DEBUG:
     ] + DRF_DEFAULT_AUTHENTICATION_CLASSES
 
 # django-sso-app
-if DJANGO_SSO_APP_BACKEND_ENABLED:
-    DRF_DEFAULT_AUTHENTICATION_CLASSES += DJANGO_SSO_APP_BACKEND_RESTFRAMEWORK_AUTHENTICATION_BACKENDS
-elif DJANGO_SSO_APP_ENABLED:
-    DRF_DEFAULT_AUTHENTICATION_CLASSES += DJANGO_SSO_APP_RESTFRAMEWORK_AUTHENTICATION_BACKENDS
+if DJANGO_SSO_APP_BACKEND_ENABLED or DJANGO_SSO_APP_ENABLED:
+    DRF_DEFAULT_AUTHENTICATION_CLASSES += ['django_sso_app.core.api.authentication.DjangoSsoApiAuthentication']
 
 
 REST_FRAMEWORK = {
@@ -529,7 +554,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 100,
-    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+    # 'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
 
     'DATETIME_FORMAT': '%Y-%m-%dT%H:%M:%S%z',
     'DEFAULT_RENDERER_CLASSES': (
@@ -540,43 +565,19 @@ REST_FRAMEWORK = {
     # https://www.django-rest-framework.org/community/3.10-announcement/#continuing-to-use-coreapi
 }
 
-# rest_auth
-
-if DJANGO_SSO_APP_BACKEND_ENABLED:
-    from django_sso_app.core.settings.restframework.jwt import *
-
 
 print('ROOT_DIR', ROOT_DIR, 'INSTALLED_APPS', INSTALLED_APPS)
 
 
-# swagger
-SWAGGER_SETTINGS = {
-    'LOGIN_URL': LOGIN_URL,
-    'LOGOUT_URL': '/admin/logout/',
-    'SECURITY_DEFINITIONS': {
-        'JWT': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header',
-            'description': 'Bearer xxx'
-        },
-        'token': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header',
-            'description': 'Token xxx'
-        }
-    }
-}
-
-
 # ------------------------------------------------------------------------------
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-SESSION_COOKIE_SAMESITE = None  # Safari 12 and chrome cross site
+if DJANGO_SSO_APP_BACKEND_ENABLED:
+    SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+    SESSION_COOKIE_SAMESITE = None  # Safari 12 and chrome cross site
 
-if DJANGO_SSO_APP_APIGATEWAY_ENABLED:
-    USE_X_FORWARDED_HOST = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    if DJANGO_SSO_APP_APIGATEWAY_ENABLED:
+        USE_X_FORWARDED_HOST = True
+        SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -589,3 +590,5 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
+
+META_DESCRIPTION = env('META_DESCRIPTION', default=APP_DOMAIN)
