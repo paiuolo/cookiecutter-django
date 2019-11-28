@@ -35,7 +35,7 @@ if settings.DJANGO_SSO_APP_BACKEND_ENABLED:
     api_urlpatterns += django_sso_app_api_urlpatterns
     _I18N_URLPATTERNS += [
         path('profile/', ProfileView.as_view(), name='profile'),
-        path('profile/update/', ProfileUpdateView.as_view(), name='profile-update'),
+        path('profile/update/', ProfileUpdateView.as_view(), name='profile_update'),
     ]
 
 elif settings.DJANGO_SSO_APP_ENABLED:

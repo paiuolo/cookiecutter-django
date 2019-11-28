@@ -377,6 +377,10 @@ CELERY_TASK_SOFT_TIME_LIMIT = env("CELERY_TASK_SOFT_TIME_LIMIT", default=60)
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#beat-scheduler
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
+# http://docs.celeryproject.org/en/latest/userguide/configuration.html#task-always-eager
+CELERY_TASK_ALWAYS_EAGER = DEBUG
+# http://docs.celeryproject.org/en/latest/userguide/configuration.html#task-eager-propagates
+CELERY_TASK_EAGER_PROPAGATES = DEBUG
 {%- endif %}
 
 # pai
@@ -498,7 +502,7 @@ ENABLE_HTTPS = env.bool("ENABLE_HTTPS", False)
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = env("ACCOUNT_DEFAULT_HTTP_PROTOCOL", default="https" if ENABLE_HTTPS else "http")
 APPEND_SLASH = True
 
-APP_DOMAIN = env("APP_DOMAIN", default="{{cookiecutter.domain_name}}")
+APP_DOMAIN = env("APP_DOMAIN", default="localhost:8000")
 APP_DOMAINS = env.list("APP_DOMAINS", default=[APP_DOMAIN, ])
 APP_URL = ACCOUNT_DEFAULT_HTTP_PROTOCOL + '://' + APP_DOMAIN
 
