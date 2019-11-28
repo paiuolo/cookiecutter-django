@@ -42,7 +42,7 @@
   "use_celery": "y",
   "use_mailhog": "n",
   "use_sentry": "y",
-  "use_whitenoise": "n",
+  "use_whitenoise": "y",
   "use_heroku": "n",
   "use_travisci": "n",
   "keep_local_envs_in_vcs": "y",

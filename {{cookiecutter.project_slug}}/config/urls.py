@@ -64,7 +64,7 @@ _I18N_URLPATTERNS += [
     path('', WebpackBuiltTemplateView.as_view(template_name='pages/home.html'), name='home'),
     path('about/', WebpackBuiltTemplateView.as_view(template_name='pages/about.html'), name='about'),
 
-    # Django Admin, use {% url 'admin:index' %}
+    # Django Admin, use % url 'admin:index' %
     path(settings.ADMIN_URL, admin.site.urls),
 ] + django_sso_app_i18n_urlpatterns
 
