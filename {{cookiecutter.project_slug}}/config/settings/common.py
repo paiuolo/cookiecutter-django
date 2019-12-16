@@ -1,3 +1,4 @@
+import os
 import sys
 import environ
 
@@ -30,7 +31,7 @@ DEFAULT_HTTP_PROTOCOL = env("DEFAULT_HTTP_PROTOCOL", default='http' if DEBUG els
 I18N_PATH_ENABLED = env.bool('I18N_PATH_ENABLED', default=True)
 
 # django-sso-app
-from django_sso_app.settings import *
+from django_sso_app.backend.settings import *
 
 DJANGO_SSO_APP_BACKEND_DOMAINS = env('DJANGO_SSO_APP_BACKEND_DOMAINS', default=[APP_DOMAIN])
 DJANGO_SSO_APP_SHAPE = env('DJANGO_SSO_APP_SHAPE', default='backend_only')

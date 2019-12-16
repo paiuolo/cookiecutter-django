@@ -42,7 +42,7 @@ _I18N_URLPATTERNS += [
     path('', WebpackBuiltTemplateViewMixin.as_view(template_name='pages/home.html'), name='home'),
     path('about/', WebpackBuiltTemplateViewMixin.as_view(template_name='pages/about.html'), name='about'),
 
-    # Django Admin, use {% url 'admin:index' %}
+    # Django Admin, use {% raw %}{% url 'admin:index' %}{% endraw %}
     path(settings.ADMIN_URL, admin.site.urls),
 ]
 
