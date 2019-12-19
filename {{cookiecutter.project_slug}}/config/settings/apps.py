@@ -11,6 +11,8 @@ DJANGO_APPS = [
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+    'django.contrib.flatpages',
 
     # 'django.contrib.humanize', # Handy template tags
     'django.contrib.admin',
@@ -33,7 +35,7 @@ LOCAL_APPS = [
 ] + DJANGO_SSO_APP_DJANGO_APPS
 
 LOCAL_APPS += [
-    'django_sso_app.backend.users.apps.UsersConfig',
+    'backend.users.apps.UsersConfig',
     # Your stuff: custom apps go here
 ] + EXTRA_APPS
 

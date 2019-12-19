@@ -5,11 +5,11 @@ from django.urls import include, path
 from django.utils import timezone
 from django.views import defaults as default_views
 from django.views.decorators.http import last_modified
-from django.views.generic import TemplateView
+from django.contrib.flatpages.views import flatpage
 from django.views.i18n import JavaScriptCatalog
 from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
-from django.views.generic.base import RedirectView
+from django.utils.translation import gettext_lazy as _
 
 # django-sso-app
 from django_sso_app.urls import (urlpatterns as django_sso_app__urlpatterns,
@@ -17,7 +17,7 @@ from django_sso_app.urls import (urlpatterns as django_sso_app__urlpatterns,
                                  i18n_urlpatterns as django_sso_app_i18n_urlpatterns)
 from django_sso_app.core.mixins import WebpackBuiltTemplateViewMixin
 
-from backend.views import set_language_from_url, StatsView, schema_view  # , SwaggerSchemaView
+from backend.views import set_language_from_url, StatsView, schema_view
 
 
 last_modified_date = timezone.now()
@@ -36,14 +36,13 @@ urlpatterns += [
     url(r'^i18n/', include('django.conf.urls.i18n')),
     url(r'^jsi18n/$', last_modified(lambda req, **kw: last_modified_date)(JavaScriptCatalog.as_view()), js_info_dict,
         name='javascript-catalog'),
+
+    # Django Admin, use {% raw %}{% url 'admin:index' %}{% endraw %}
+    path(settings.ADMIN_URL, admin.site.urls),
 ]
 
 _I18N_URLPATTERNS += [
     path('', WebpackBuiltTemplateViewMixin.as_view(template_name='pages/home.html'), name='home'),
-    path('about/', WebpackBuiltTemplateViewMixin.as_view(template_name='pages/about.html'), name='about'),
-
-    # Django Admin, use {% raw %}{% url 'admin:index' %}{% endraw %}
-    path(settings.ADMIN_URL, admin.site.urls),
 ]
 
 if settings.I18N_PATH_ENABLED:
@@ -87,7 +86,7 @@ if settings.DEBUG:
     if 'debug_toolbar' in settings.INSTALLED_APPS:
         import debug_toolbar
 
-        urlpatterns = [path('__debug__/', include(debug_toolbar.urls))] + urlpatterns
+        urlpatterns += [path('__debug__/', include(debug_toolbar.urls))]
 
 
 api_urlpatterns += [
@@ -105,5 +104,12 @@ urlpatterns += [
 ]
 
 for lang, _name in settings.LANGUAGES:
-    urlpatterns.append(url(r'^{}/login/$'.format(lang), RedirectView.as_view(url='/login/', permanent=False)))
-    urlpatterns.append(url(r'^{}/signup/$'.format(lang), RedirectView.as_view(url='/signup/', permanent=False)))
+    # flatpages
+    urlpatterns.append(path(_('{}/about/'.format(lang)), flatpage, {'url': '/{}/about/'.format(lang)}, name='about-{}'.format(lang)))
+
+# flatpages
+urlpatterns += [
+    path('<path:url>', include('django.contrib.flatpages.urls')),
+]
+
+print('URLPATTERNS', urlpatterns)

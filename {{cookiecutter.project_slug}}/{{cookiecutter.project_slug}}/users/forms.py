@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model, forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
-from django.conf import settings # pai
+from django_sso_app.core import app_settings
 
 User = get_user_model()
 
@@ -35,7 +35,7 @@ class UserCreationForm(forms.UserCreationForm):
     def __init__(self, *args, **kwargs):
         super(UserCreationForm, self).__init__(*args, **kwargs)
 
-        if getattr(settings, 'DJANGO_SSO_APP_BACKEND_ENABLED', False):
+        if app_settings.BACKEND_ENABLED:
             # removing unnecessary password fields
             self.fields['password1'].required = False
             self.fields['password2'].required = False

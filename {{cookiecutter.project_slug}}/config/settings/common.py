@@ -10,7 +10,7 @@ TESTING_MODE = 'test' in sys.argv
 
 ROOT_DIR = (
     environ.Path(__file__) - 3
-)  # (django_sso_app/backend/config/settings/common.py - 4 = django_sso_app/)
+)
 BACKEND_DIR = ROOT_DIR.path("backend")
 
 READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)

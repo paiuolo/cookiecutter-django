@@ -1,5 +1,5 @@
-{% raw %}{% load static i18n {% endraw %}{% if cookiecutter.use_compressor == "y" %}compress{% endif %}{% raw %}%}<!DOCTYPE html>
-<html lang="en">
+{% raw %}{% load static i18n {% endraw %}{% if cookiecutter.use_compressor == "y" %}compress{% endif %}{% raw %}%}{% get_current_language as LANGUAGE_CODE %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -35,62 +35,33 @@
   </head>
 
   <body>
+    {% block navs %}{% include 'partials/nav_pills.html' %}{% endblock navs %}
+    
+    {% block body %}
 
-    <div id="menu">
-        <div class="container">
-            <ul class="nav justify-content-center">
-                <li class="nav-item">
-                    <a class="nav-link active" href="{% url 'home' %}">Home <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link " href="{% url 'about' %}">About</a>
-                </li>
-                {% if DJANGO_SSO_APP_BACKEND_ENABLED %}
-                    {% if request.user.is_authenticated %}
-                    <li class="nav-item">
-                    {# URL provided by django-allauth/account/urls.py #}
-                        <a class="nav-link" href="/profile/">{% trans "Profile" %}</a>
-                    </li>
-                    <li class="nav-item">
-                    {# URL provided by django-allauth/account/urls.py #}
-                        <a class="nav-link" href="/profile/update/">{% trans "Update Profile" %}</a>
-                    </li>
-                    <li class="nav-item">
-                    {# URL provided by django-allauth/account/urls.py #}
-                        <a class="nav-link" href="{% url 'account_email' %}">{% trans "Change E-mail" %}</a>
-                    </li>
-                    <li class="nav-item">
-                    {# URL provided by django-allauth/account/urls.py #}
-                        <a class="nav-link" href="{% url 'account_logout' %}">{% trans "Sign Out" %}</a>
-                    </li>
-                    {% else %}
-                    <li class="nav-item">
-                    {# URL provided by django-allauth/account/urls.py #}
-                        <a id="sign-up-link" class="nav-link" href="{% url 'account_signup' %}">{% trans "Sign Up" %}</a>
-                    </li>
-                    <li class="nav-item">
-                    {# URL provided by django-allauth/account/urls.py #}
-                        <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">{% trans "Sign In" %}</a>
-                    </li>
-                    {% endif %}
-                {% endif %}
-            </ul>
-        </div>
-    </div>
-
-    <div class="container">
+    <div id="content">
 
       {% if messages %}
-          {% for message in messages %}
-              <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
-          {% endfor %}
+      <div class="container">
+          <div class="row">
+              <div class="col-md-8 offset-md-2 col-lg-6 offset-lg-3">
+                  {% for message in messages %}
+                      <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                          {{ message }}
+                          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                  {% endfor %}
+              </div>
+          </div>
+      </div>
       {% endif %}
 
       {% block content %}
-        <p>Use this document as a way to quick start any new project.</p>
       {% endblock content %}
 
-    </div> <!-- /container -->
+    </div>
+
+    {% endblock body %}
 
     {% block modal %}{% endblock modal %}
 

@@ -15,3 +15,5 @@ django-allauth<0.41  # https://github.com/pennersr/django-allauth
 cherrypy==18.2.0
 
 django-meta
+
+# django-sso-app packed-up in requirements folder

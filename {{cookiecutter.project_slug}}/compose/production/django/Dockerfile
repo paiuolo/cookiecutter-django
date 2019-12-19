@@ -16,13 +16,13 @@ RUN addgroup -S django \
     && adduser -S -G django django
 
 # Requirements are installed here to ensure they will be cached.
-COPY ./requirements /requirements
-RUN pip install --no-cache-dir -r /requirements/production.txt \
-    && rm -rf /requirements
+COPY ./requirements/*.txt /requirements/
+RUN pip install --no-cache-dir -r /requirements/production.txt
+RUN pip install --no-cache-dir -r /requirements/extra.txt
 
-COPY ./requirements /requirements
-RUN pip install --no-cache-dir -r /requirements/extra.txt \
-    && rm -rf /requirements
+COPY ./requirements/*.tar.gz /requirements/
+RUN find /requirements -name '*.tar.gz' -exec pip install {} \;
+RUN rm -rf /requirements
 
 COPY ./compose/production/django/entrypoint /entrypoint
 RUN sed -i 's/\r$//g' /entrypoint
@@ -55,7 +55,7 @@ COPY ./server.py /app/
 
 RUN chown -R django /app
 
-USER django
+# USER django
 
 WORKDIR /app
 

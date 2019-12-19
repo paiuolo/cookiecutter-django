@@ -1,0 +1,9 @@
+{% raw %}{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block title %}{{ flatpage.title }}{% endblock title %}
+
+{% block navs %}{% include 'partials/nav_pills.html' %}{% endblock navs %}
+
+{% block content %}{{ flatpage.content }}{% endblock content %}{% endraw %}

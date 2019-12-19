@@ -10,11 +10,6 @@ from django.shortcuts import redirect
 from rest_framework.views import Response, status, APIView
 from rest_framework.permissions import AllowAny
 from rest_framework import permissions
-"""
-from rest_framework.schemas import SchemaGenerator
-from rest_framework_swagger import renderers
-from rest_framework.schemas.coreapi import AutoSchema
-"""
 
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -92,38 +87,10 @@ class StatsView(APIView):
             logger.exception('Error getting health {}'.format(err_msg))
             return Response(err_msg, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-"""
-class SwaggerSchemaView(APIView):
-    permission_classes = (AllowAny,)
-    renderer_classes = (
-        renderers.OpenAPIRenderer,
-    )
-    title = 'Django SSO App'
-    default_version = 'v1'
-    patterns = []
-
-    def get(self, request):
-        generator = SchemaGenerator(title=self.title, patterns=self.patterns)
-        schema = generator.get_schema(request=request)
-
-        return Response(schema)
-"""
-
-"""
-from rest_framework.schemas import get_schema_view
-
-urlpatterns += [
-    #url(r'^api/v1/$', SwaggerSchemaView.as_view(patterns=api_urlpatterns), name="swagger")
-    url(r'^api/v1/$', get_schema_view(
-        title="Your Project",
-        description="API for all things …"
-    ), name='openapi-schema'),
-]
-"""
 
 schema_view = get_schema_view(
    openapi.Info(
-      title="Django SSO App",
+      title="{{ cookiecutter.project_name }}",
       default_version='v1',
    ),
    public=True,

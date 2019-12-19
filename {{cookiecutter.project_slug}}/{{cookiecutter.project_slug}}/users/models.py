@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from django_sso_app.core.apps.users.models import DjangoSsoAppUserModelMixin
 
-logger = logging.getLogger('django_sso_app.backend.users')
+logger = logging.getLogger('backend.users')
 
 
 class User(AbstractUser, DjangoSsoAppUserModelMixin):
