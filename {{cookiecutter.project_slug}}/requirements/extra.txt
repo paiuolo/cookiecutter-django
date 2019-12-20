@@ -1,8 +1,5 @@
 ipython
 
-django-debug-toolbar<2.1
-django-extensions<2.3
-
 # OpenApi
 drf-yasg<1.18
 

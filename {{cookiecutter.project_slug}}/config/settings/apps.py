@@ -1,4 +1,5 @@
 from django_sso_app.backend.settings import DJANGO_SSO_APP_DJANGO_APPS
+from .common import *
 from .extra import EXTRA_APPS
 
 
@@ -38,6 +39,9 @@ LOCAL_APPS += [
     'backend.users.apps.UsersConfig',
     # Your stuff: custom apps go here
 ] + EXTRA_APPS
+
+if not REDIS_ENABLED:
+    EXTRA_APPS += ['django_celery_results']
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS
