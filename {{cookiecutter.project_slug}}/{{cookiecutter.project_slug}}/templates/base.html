@@ -53,6 +53,15 @@
             </li>
             {% if request.user.is_authenticated %}
               <li class="nav-item">
+              {# URL provided by django-sso-app/core/apps/profiles/urls.py #}
+                  <a class="nav-link" href="{% url 'profile' %}">{% trans "Profile" %}</a>
+              </li>
+              <li class="nav-item">
+              {# URL provided by django-sso-app/core/apps/profiles/urls.py #}
+                  <a class="nav-link" href="{% url 'profile.update' %}">{% trans "Update Profile" %}</a>
+              </li>
+
+              <li class="nav-item">
                 {# URL provided by django-allauth/account/urls.py #}
                 <a class="nav-link" href="{% url 'users:detail' request.user.username  %}">{% trans "My Profile" %}</a>
               </li>

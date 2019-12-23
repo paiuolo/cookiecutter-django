@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+{% load account socialaccount %}
+{% load crispy_forms_tags %}
+
+{% block title %}User: {{ user.username }}{% endblock %}
+
+{% block content %}
+<div class="user-profile">
+{% if user.is_authenticated %}
+    <h1>
+    {{ user.username }}
+    </h1>
+
+    <form class="form-horizontal" method="post" action="{% url 'profile.update' %}">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <div class="control-group">
+            <div class="controls">
+                <button type="submit" class="btn btn-primary">Update</button>
+            </div>
+        </div>
+    </form>
+
+{% else %}
+    <h1>
+    {% blocktrans %}You are not logged in.{% endblocktrans %}
+    </h1>
+
+    <a class="btn btn-primary" href="{% url 'account_login' %}" role="button">
+    {% trans "Login" %}
+    </a>
+    <a class="btn btn-primary" href="{% url 'account_signup' %}" role="button">
+    {% trans "Register" %}
+    </a>
+
+{% endif %}
+</div>
+{% endblock content %}

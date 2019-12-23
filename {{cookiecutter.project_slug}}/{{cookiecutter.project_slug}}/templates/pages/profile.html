@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block title %}User: {{ user.username }}{% endblock %}
+
+{% block content %}
+  <div class="user-profile">
+      {% if user.is_authenticated %}
+      <h1>
+          {{ user.username }}
+      </h1>
+
+      <h3>{{ user.email }}</h3>
+
+      {% if user.sso_app_profile.picture %}
+          <img src="{{user.sso_app_profile.picture}}" alt="picture"/>
+      {% endif %}
+
+      {% else %}
+      <h1>
+          {% blocktrans %}You are not logged in.{% endblocktrans %}
+      </h1>
+
+      <a class="btn btn-primary" href="{% url 'account_login' %}" role="button">
+        {% trans "Login" %}
+      </a>
+
+      <a class="btn btn-primary" href="{% url 'account_signup' %}" role="button">
+        {% trans "Register" %}
+      </a>
+
+      {% endif %}
+  </div>
+{% endblock content %}
