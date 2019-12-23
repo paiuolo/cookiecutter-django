@@ -35,6 +35,7 @@
   </head>
 
   <body>
+    {% block body %}
 
     <div class="mb-1">
       <nav class="navbar navbar-expand-md navbar-light bg-light">
@@ -100,6 +101,8 @@
     </div> <!-- /container -->
 
     {% block modal %}{% endblock modal %}
+
+    {% endblock body %}
 
     <!-- Le javascript
     ================================================== -->
