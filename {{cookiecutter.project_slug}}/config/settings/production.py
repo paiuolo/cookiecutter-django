@@ -109,7 +109,7 @@ GS_DEFAULT_ACL = "publicRead"
 # ------------------------
 {% endif -%}
 {% if cookiecutter.use_whitenoise == 'y' -%}
-# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage" # pai
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage" # pai
 {% elif cookiecutter.cloud_provider == 'AWS' -%}
 STATICFILES_STORAGE = "config.settings.production.StaticRootS3Boto3Storage"
 COLLECTFAST_STRATEGY = "collectfast.strategies.boto3.Boto3Strategy"

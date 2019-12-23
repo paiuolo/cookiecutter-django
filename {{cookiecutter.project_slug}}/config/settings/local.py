@@ -42,6 +42,14 @@ EMAIL_BACKEND = env(
 )
 {%- endif %}
 
+{%- if cookiecutter.use_whitenoise == 'y' %}
+
+# WhiteNoise
+# ------------------------------------------------------------------------------
+# http://whitenoise.evans.io/en/latest/django.html#using-whitenoise-in-development
+INSTALLED_APPS = ["whitenoise.runserver_nostatic"] + INSTALLED_APPS  # noqa F405
+{% endif %}
+
 # django-debug-toolbar
 # ------------------------------------------------------------------------------
 # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#prerequisites
@@ -56,7 +64,7 @@ DEBUG_TOOLBAR_CONFIG = {
 # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#internal-ips
 INTERNAL_IPS = ["127.0.0.1", "10.0.2.2"]
 {% if cookiecutter.use_docker == 'y' -%}
-if env("USE_DOCKER", default="yes") == "yes":
+if env("USE_DOCKER") == "yes":
     import socket
 
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())

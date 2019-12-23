@@ -6,10 +6,8 @@ class UsersConfig(AppConfig):
     name = "backend.users"
     verbose_name = _("Users")
 
-    def ready(self, *args):
+    def ready(self):
         try:
-            import django_sso_app.core.apps.users.signals  # noqa F401
+            import backend.users.signals  # noqa F401
         except ImportError:
             pass
-
-        super(UsersConfig, self).ready(*args)

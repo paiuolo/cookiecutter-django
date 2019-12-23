@@ -56,7 +56,10 @@ else:
 
 # Your stuff: custom urls includes go here
 urlpatterns += [
-    # path('users/', include('django_sso_app.backend.users.urls', namespace='users')),
+    path('users/', include('backend.users.urls', namespace='users')),
+
+    # flatpages
+    path('about/', flatpage, {'url': '/about/'}, name='about'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
@@ -103,9 +106,10 @@ urlpatterns += [
     # url(r'^api/v1/redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
 
-for lang, _name in settings.LANGUAGES:
-    # flatpages
-    urlpatterns.append(path(_('{}/about/'.format(lang)), flatpage, {'url': '/{}/about/'.format(lang)}, name='about-{}'.format(lang)))
+if settings.I18N_PATH_ENABLED:
+    for lang, _name in settings.LANGUAGES:
+        # flatpages
+        urlpatterns.append(path(_('{}/about/'.format(lang)), flatpage, {'url': '/{}/about/'.format(lang)}, name='about-{}'.format(lang)))
 
 # flatpages
 urlpatterns += [

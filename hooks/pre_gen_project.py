@@ -67,4 +67,4 @@ if (
     print(
         "You should either use Whitenoise or select a Cloud Provider to serve static files"
     )
-    sys.exit(1)
+    # sys.exit(1)  # pai
