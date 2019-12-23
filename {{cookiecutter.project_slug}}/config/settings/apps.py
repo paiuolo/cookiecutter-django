@@ -1,4 +1,3 @@
-from django_sso_app.backend.settings import DJANGO_SSO_APP_DJANGO_APPS
 from .common import *
 from .extra import EXTRA_APPS
 
