@@ -6,10 +6,10 @@ set -o nounset
 
 
 # pai
-python manage.py migrate --noinput
+# python manage.py migrate --noinput
 
 # load fixtures
-find ./fixtures -name '*.json' -exec python manage.py loaddata {} \;
+# find ./fixtures -name '*.json' -exec python manage.py loaddata {} \;
 
 python manage.py collectstatic --noinput
 
