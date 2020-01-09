@@ -13,8 +13,6 @@ drf-yasg<1.18
 
 pyjwt<1.8
 
-django-allauth<0.41  # https://github.com/pennersr/django-allauth
-
 # server
 # ------------------------------------------------------------------------------
 cherrypy==18.2.0

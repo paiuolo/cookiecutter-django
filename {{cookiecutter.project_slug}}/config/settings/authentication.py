@@ -5,7 +5,7 @@ from .common import *
 # https://docs.djangoproject.com/en/dev/ref/settings/#authentication-backends
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
-] + DJANGO_SSO_APP_BACKEND_DJANGO_AUTHENTICATION_BACKENDS
+] + DJANGO_SSO_APP_DJANGO_AUTHENTICATION_BACKENDS
 
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model

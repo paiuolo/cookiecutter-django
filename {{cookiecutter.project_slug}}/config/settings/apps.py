@@ -40,7 +40,7 @@ LOCAL_APPS += [
 ] + EXTRA_APPS
 
 if not REDIS_ENABLED:
-    EXTRA_APPS += ['django_celery_results']
+    LOCAL_APPS += ['django_celery_results']
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS
