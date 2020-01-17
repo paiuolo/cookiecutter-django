@@ -203,7 +203,11 @@ ANYMAIL = {
     "MAILGUN_API_URL": env("MAILGUN_API_URL", default="https://api.mailgun.net/v3"),
 }
 """
-EMAIL_BACKEND = "anymail.backends.sendgrid.EmailBackend"
+if DEBUG or env.bool('DJANGO_CONSOLE_EMAIL_BACKEND', default=False):
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+else:
+    EMAIL_BACKEND = "anymail.backends.sendgrid.EmailBackend"
+
 # https://anymail.readthedocs.io/en/stable/installation/#anymail-settings-reference
 ANYMAIL = {
     "SENDGRID_API_KEY": env("SENDGRID_API_KEY"),
