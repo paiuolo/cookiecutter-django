@@ -20,12 +20,15 @@ from .languages import *
 from .restframework import *
 from .meta import *
 from .celery import *
+from .extra import *
 
 # ------------------------------------------------------------------------------
 
+"""
 print('ROOT_DIR', ROOT_DIR,
       'INSTALLED_APPS', INSTALLED_APPS,
       'MIDDLEWARE', MIDDLEWARE,
       'AUTHENTICATION_BACKENDS', AUTHENTICATION_BACKENDS,
       'LANGUAGES', LANGUAGES,
       'LOGGING', LOGGING.keys())
+"""

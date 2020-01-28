@@ -116,4 +116,4 @@ urlpatterns += [
     path('<path:url>', include('django.contrib.flatpages.urls')),
 ]
 
-print('URLPATTERNS', urlpatterns)
+# print('URLPATTERNS', urlpatterns)
