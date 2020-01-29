@@ -25,4 +25,4 @@ django-meta
 django-cache-memoize
 tweepy
 feedparser
-# lxml # by alpine repo
+lxml

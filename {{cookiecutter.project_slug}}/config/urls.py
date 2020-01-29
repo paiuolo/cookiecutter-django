@@ -4,6 +4,9 @@ from django.contrib import admin
 from django.urls import include, path
 from django.utils import timezone
 from django.views import defaults as default_views
+{% if cookiecutter.use_drf == 'y' -%}
+from rest_framework.authtoken.views import obtain_auth_token
+{%- endif %}
 from django.views.decorators.http import last_modified
 from django.contrib.flatpages.views import flatpage
 from django.views.i18n import JavaScriptCatalog
@@ -63,6 +66,16 @@ urlpatterns += [
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+{% if cookiecutter.use_drf == 'y' -%}
+# API URLS
+""" pai
+urlpatterns += [
+    # API base url
+    path("api/", include("config.api_router")),
+    # DRF auth token
+    path("auth-token/", obtain_auth_token),
+]
+"""{%- endif %}
 
 if settings.DEBUG:
     # This allows the error pages to be debugged during development, just visit
