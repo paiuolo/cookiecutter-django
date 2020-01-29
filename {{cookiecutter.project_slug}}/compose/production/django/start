@@ -1,15 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
 set -o errexit
 set -o pipefail
 set -o nounset
 
-
-# pai
-# python manage.py migrate --noinput
-
-# load fixtures
-# find ./fixtures -name '*.json' -exec python manage.py loaddata {} \;
 
 exec python server.py  # pai
 # python manage.py collectstatic --chdir=/app

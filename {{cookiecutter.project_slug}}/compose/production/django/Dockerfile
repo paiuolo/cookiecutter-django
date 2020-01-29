@@ -68,9 +68,6 @@ RUN chmod +x /usr/local/bin/maintenance/*
 RUN mv /usr/local/bin/maintenance/* /usr/local/bin \
     && rmdir /usr/local/bin/maintenance
 
-COPY ./server.py /app/  # pai
-
-
 {%- if cookiecutter.js_task_runner == 'Gulp' %}
 COPY --from=client-builder --chown=django:django /app /app
 {% else %}
