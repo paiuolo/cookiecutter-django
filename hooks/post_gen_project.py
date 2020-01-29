@@ -70,7 +70,7 @@ def remove_heroku_files():
     for file_name in file_names:
         if (
             file_name == "requirements.txt"
-            and "{{ cookiecutter.use_travisci }}".lower() == "y"
+            and "{{ cookiecutter.ci_tool }}".lower() == "travis"
         ):
             # don't remove the file if we are using travisci but not using heroku
             continue
@@ -103,6 +103,10 @@ def remove_celery_files():
 
 def remove_dottravisyml_file():
     os.remove(".travis.yml")
+
+
+def remove_dotgitlabciyml_file():
+    os.remove(".gitlab-ci.yml")
 
 
 # pai
@@ -288,6 +292,11 @@ def remove_aws_dockerfile():
     shutil.rmtree(os.path.join("compose", "production", "aws"))
 
 
+def remove_drf_starter_files():
+    os.remove(os.path.join("config", "api_router.py"))
+    shutil.rmtree(os.path.join("{{cookiecutter.project_slug}}", "users", "api"))
+
+
 def main():
     debug = "{{ cookiecutter.debug }}".lower() == "y"
 
@@ -354,10 +363,15 @@ def main():
         if "{{ cookiecutter.use_docker }}".lower() == "y":
             remove_celery_compose_dirs()
 
-    if "{{ cookiecutter.use_travisci }}".lower() == "n":
+    if "{{ cookiecutter.ci_tool }}".lower() != "travis":
         remove_dottravisyml_file()
 
+    if "{{ cookiecutter.ci_tool }}".lower() != "gitlab":
+        remove_dotgitlabciyml_file()
 
+    if "{{ cookiecutter.use_drf }}".lower() == "n":
+        remove_drf_starter_files()
+			
     # pai
     rename_backend_folder()
 

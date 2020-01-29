@@ -9,31 +9,30 @@ RUN npm run build
 
 # Python build stage
 {%- endif %}
-FROM python:3.7-alpine
+FROM python:3.7-slim-buster
 
 ENV PYTHONUNBUFFERED 1
 
-RUN apk update \
+RUN apt-get update \
+  # dependencies for building Python packages
+  && apt-get install -y build-essential \
   # psycopg2 dependencies
-  && apk add --virtual build-deps gcc python3-dev musl-dev \
-  && apk add postgresql-dev \
-  # Pillow dependencies
-  && apk add jpeg-dev zlib-dev freetype-dev lcms2-dev openjpeg-dev tiff-dev tk-dev tcl-dev \
-  # CFFI dependencies
-  && apk add libffi-dev py-cffi \
-  && apk add bash nano libpng-dev
+  && apt-get install -y libpq-dev \
+  # Translations dependencies
+  && apt-get install -y gettext \
+  # cleaning up unused files
+  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+  && rm -rf /var/lib/apt/lists/*
 
-RUN addgroup -S django \
-    && adduser -S -G django django
+RUN addgroup --system django \
+    && adduser --system --ingroup django django
 
 # Requirements are installed here to ensure they will be cached.
-COPY ./requirements/*.txt /requirements/
-RUN pip install --no-cache-dir -r /requirements/production.txt
-RUN pip install --no-cache-dir -r /requirements/extra.txt
-
-COPY ./requirements/*.tar.gz /requirements/
-RUN find /requirements -name '*.tar.gz' -exec pip install {} \;
-RUN rm -rf /requirements
+COPY ./requirements /requirements
+RUN pip install --no-cache-dir -r /requirements/production.txt \
+	&& pip install --no-cache-dir -r /requirements/extra.txt \
+	&& find /requirements -name '*.tar.gz' -exec pip install {} \; \
+    && rm -rf /requirements
 
 COPY ./compose/production/django/entrypoint /entrypoint
 RUN sed -i 's/\r$//g' /entrypoint
@@ -61,12 +60,6 @@ RUN sed -i 's/\r$//g' /start-flower
 RUN chmod +x /start-flower
 {%- endif %}
 
-{%- if cookiecutter.js_task_runner == 'Gulp' %}
-COPY --from=client-builder /app /app
-{% else %}
-COPY . /app
-{%- endif %}
-
 
 # maintenance
 RUN mkdir /backups
@@ -75,11 +68,14 @@ RUN chmod +x /usr/local/bin/maintenance/*
 RUN mv /usr/local/bin/maintenance/* /usr/local/bin \
     && rmdir /usr/local/bin/maintenance
 
+COPY ./server.py /app/  # pai
 
-COPY ./server.py /app/
 
-RUN chown -R django /app
-
+{%- if cookiecutter.js_task_runner == 'Gulp' %}
+COPY --from=client-builder --chown=django:django /app /app
+{% else %}
+COPY --chown=django:django . /app
+{%- endif %}
 USER django
 
 WORKDIR /app

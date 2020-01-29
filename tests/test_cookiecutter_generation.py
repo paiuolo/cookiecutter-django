@@ -33,6 +33,7 @@ def context():
 @pytest.mark.parametrize("use_mailhog", ["y", "n"], ids=lambda yn: f"mailhog:{yn}")
 @pytest.mark.parametrize("use_sentry", ["y", "n"], ids=lambda yn: f"sentry:{yn}")
 @pytest.mark.parametrize("use_compressor", ["y", "n"], ids=lambda yn: f"cmpr:{yn}")
+@pytest.mark.parametrize("use_drf", ["y", "n"], ids=lambda yn: f"drf:{yn}")
 @pytest.mark.parametrize(
     "use_whitenoise,cloud_provider",
     [
@@ -41,7 +42,7 @@ def context():
         ("y", "None"),
         ("n", "AWS"),
         ("n", "GCP"),
-        # no whitenoise + co cloud provider is not supported
+        # no whitenoise + no cloud provider is not supported
     ],
     ids=lambda id: f"wnoise:{id[0]}-cloud:{id[1]}",
 )
@@ -53,6 +54,7 @@ def context_combination(
     use_sentry,
     use_compressor,
     use_whitenoise,
+    use_drf,
     cloud_provider,
 ):
     """Fixture that parametrize the function where it's used."""
@@ -64,6 +66,7 @@ def context_combination(
         "use_mailhog": use_mailhog,
         "use_sentry": use_sentry,
         "use_whitenoise": use_whitenoise,
+        "use_drf": use_drf,
         "cloud_provider": cloud_provider,
     }
 
@@ -140,7 +143,7 @@ def test_black_passes(cookies, context_combination):
 
 
 def test_travis_invokes_pytest(cookies, context):
-    context.update({"use_travisci": "y"})
+    context.update({"ci_tool": "Travis"})
     result = cookies.bake(extra_context=context)
 
     assert result.exit_code == 0
@@ -151,6 +154,24 @@ def test_travis_invokes_pytest(cookies, context):
     with open(f"{result.project}/.travis.yml", "r") as travis_yml:
         try:
             assert yaml.load(travis_yml)["script"] == ["pytest"]
+        except yaml.YAMLError as e:
+            pytest.fail(e)
+
+
+def test_gitlab_invokes_flake8_and_pytest(cookies, context):
+    context.update({"ci_tool": "Gitlab"})
+    result = cookies.bake(extra_context=context)
+
+    assert result.exit_code == 0
+    assert result.exception is None
+    assert result.project.basename == context["project_slug"]
+    assert result.project.isdir()
+
+    with open(f"{result.project}/.gitlab-ci.yml", "r") as gitlab_yml:
+        try:
+            gitlab_config = yaml.load(gitlab_yml)
+            assert gitlab_config["flake8"]["script"] == ["flake8"]
+            assert gitlab_config["pytest"]["script"] == ["pytest"]
         except yaml.YAMLError as e:
             pytest.fail(e)
 

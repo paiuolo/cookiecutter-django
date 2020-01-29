@@ -75,6 +75,11 @@ LOGGING = {
             'propagate': True,
             'level': 'DEBUG'
         },
+        'apps': {
+            'handlers': ['console'],
+            'propagate': True,
+            'level': 'DEBUG'
+        },
         'django': {
             'handlers': ['mail_admins'],
             'level': 'ERROR',

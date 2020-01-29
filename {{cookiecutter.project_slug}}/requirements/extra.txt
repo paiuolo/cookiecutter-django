@@ -20,3 +20,9 @@ cherrypy==18.2.0
 django-meta
 
 # django-sso-app packed-up in requirements folder
+
+# django-fisherman
+django-cache-memoize
+tweepy
+feedparser
+# lxml # by alpine repo

@@ -1,14 +1,10 @@
 {
-  "_copy_without_render": [
-    "templates/pages/profile.html"
-  ],
-
-  "project_name": "Django Uploads",
+  "project_name": "Django Fisherman",
   "project_slug": "{{ cookiecutter.project_name.lower()|replace(' ', '_')|replace('-', '_')|replace('.', '_')|trim() }}",
-  "description": "Django Uploads Manager",
+  "description": "It never runs out of fishes!",
   "author_name": "Luca Bertuol",
-  "domain_name": "{{ cookiecutter.project_slug }}.example.com",
-  "email": "paiuolo@gmail.com",
+  "domain_name": "example.com",
+  "email": "{{ cookiecutter.author_name.lower()|replace(' ', '-') }}@example.com",
   "version": "0.0.1",
   "open_source_license": [
     "MIT",
@@ -19,10 +15,10 @@
   ],
   "timezone": "UTC",
   "windows": "n",
-  "use_pycharm": "n",
+  "use_pycharm": "y",
   "use_docker": "y",
   "postgresql_version": [
-    "9.6",
+  	"9.6",
     "11.3",
     "10.8",
     "9.5",
@@ -33,10 +29,11 @@
     "Gulp"
   ],
   "cloud_provider": [
-    "None",
+  	"None",
     "AWS",
     "GCP"
   ],
+  "use_drf": "y",
   "custom_bootstrap_compilation": "n",
   "use_compressor": "n",
   "use_celery": "y",
@@ -44,8 +41,12 @@
   "use_sentry": "y",
   "use_whitenoise": "n",
   "use_heroku": "n",
-  "use_travisci": "n",
+  "ci_tool": [
+    "None",
+    "Travis",
+    "Gitlab"
+  ],
   "keep_local_envs_in_vcs": "y",
 
-  "debug": "y"
+  "debug": "n"
 }

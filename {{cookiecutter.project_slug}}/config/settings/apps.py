@@ -41,8 +41,5 @@ LOCAL_APPS += [
 
 LOCAL_APPS += ['django_celery_results']
 
-if not REDIS_ENABLED:
-    LOCAL_APPS += ['kombu.transport.django']
-
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS

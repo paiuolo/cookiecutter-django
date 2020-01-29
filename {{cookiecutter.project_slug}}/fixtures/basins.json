@@ -1,0 +1,46 @@
+[
+{
+    "model": "fisherman.basin",
+    "pk": "61c95b24-f3a4-4602-a82b-74b7b9326d39",
+    "fields": {
+        "is_active": true,
+        "note": null,
+        "created_at": "2019-06-24T16:15:30.410Z",
+        "name": "Google CSE",
+        "slug": "google-cse"
+    }
+},
+{
+    "model": "fisherman.basin",
+    "pk": "7fae3129-fe90-413a-96f9-1fd40b176b22",
+    "fields": {
+        "is_active": false,
+        "note": null,
+        "created_at": "2019-06-24T16:15:36.965Z",
+        "name": "Google",
+        "slug": "google"
+    }
+},
+{
+    "model": "fisherman.basin",
+    "pk": "bf8f43b2-a928-4fbb-95ff-1b29a6aa2941",
+    "fields": {
+        "is_active": true,
+        "note": null,
+        "created_at": "2019-06-24T16:15:18.444Z",
+        "name": "Twitter",
+        "slug": "twitter"
+    }
+},
+{
+    "model": "fisherman.basin",
+    "pk": "cabdada1-d843-44a5-8d04-5d6fa77e8c8c",
+    "fields": {
+        "is_active": true,
+        "note": null,
+        "created_at": "2019-06-24T16:15:40.821Z",
+        "name": "RSS",
+        "slug": "rss"
+    }
+}
+]
