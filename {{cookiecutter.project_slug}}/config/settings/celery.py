@@ -12,11 +12,14 @@ if REDIS_ENABLED:
     # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-broker_url
     CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/0")
     # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-result_backend
-    CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+    # CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 else:
+    # https://docs.celeryproject.org/en/3.1/getting-started/brokers/django.html
+    CELERY_BROKER_URL = 'django://'
     # django-sso-app
     CELERY_CACHE_BACKEND = 'django-cache'
-    CELERY_RESULT_BACKEND = 'django-db'
+
+CELERY_RESULT_BACKEND = 'django-db'  # pai
 
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-accept_content
 CELERY_ACCEPT_CONTENT = ["json"]
