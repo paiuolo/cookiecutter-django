@@ -1,10 +1,10 @@
 {
-  "project_name": "Django Fisherman",
+  "project_name": "DjangoCMS pai",
   "project_slug": "{{ cookiecutter.project_name.lower()|replace(' ', '_')|replace('-', '_')|replace('.', '_')|trim() }}",
-  "description": "It never runs out of fishes!",
+  "description": "DjangoCMS on cookiecutter",
   "author_name": "Luca Bertuol",
   "domain_name": "example.com",
-  "email": "{{ cookiecutter.author_name.lower()|replace(' ', '-') }}@example.com",
+  "email": "paiuolo@gmail.com",
   "version": "0.0.1",
   "open_source_license": [
     "MIT",

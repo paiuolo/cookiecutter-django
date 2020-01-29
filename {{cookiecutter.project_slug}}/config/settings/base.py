@@ -142,12 +142,11 @@ THIRD_PARTY_APPS = [
     # pai
     "corsheaders",
     "meta",
+{%- if cookiecutter.use_celery == 'y' %}
     "django_filters",
     "django_celery_beat",
-    "drf_yasg",
-{%- if cookiecutter.use_celery == 'y' %}
-    "django_celery_beat",
     "django_celery_results",
+    "drf_yasg",
 {%- endif %}
 ]
 
