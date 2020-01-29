@@ -29,7 +29,7 @@ APP_DOMAIN = env("APP_DOMAIN", default="localhost:8000")
 COOKIE_DOMAIN = env("COOKIE_DOMAIN", default='localhost')
 DEFAULT_HTTP_PROTOCOL = env("DEFAULT_HTTP_PROTOCOL", default='http' if DEBUG else 'https')
 I18N_PATH_ENABLED = env.bool('I18N_PATH_ENABLED', default=True)
-REDIS_ENABLED = env.bool('REDIS_ENABLED', default=True)
+REDIS_ENABLED = env.bool('REDIS_ENABLED', default=False)
 
 # django-sso-app
 from django_sso_app.settings import *

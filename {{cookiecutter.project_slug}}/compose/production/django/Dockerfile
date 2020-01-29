@@ -67,6 +67,15 @@ COPY --from=client-builder /app /app
 COPY . /app
 {%- endif %}
 
+
+# maintenance
+RUN mkdir /backups
+COPY ./compose/production/django/maintenance /usr/local/bin/maintenance
+RUN chmod +x /usr/local/bin/maintenance/*
+RUN mv /usr/local/bin/maintenance/* /usr/local/bin \
+    && rmdir /usr/local/bin/maintenance
+
+
 COPY ./server.py /app/
 
 RUN chown -R django /app
