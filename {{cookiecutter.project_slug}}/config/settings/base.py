@@ -4,6 +4,7 @@ Base settings to build other settings files upon.
 
 import environ
 import sys
+import os
 
 ROOT_DIR = (
     environ.Path(__file__) - 3
@@ -464,6 +465,16 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
 
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 100,
+    # "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
+
+    "DATETIME_FORMAT": "%Y-%m-%dT%H:%M:%S%z",
+
+    # "DEFAULT_RENDERER_CLASSES": (
+    #     "rest_framework.renderers.JSONRenderer",
+    #     "rest_framework.renderers.BrowsableAPIRenderer",
+    # ),
 }
 {%- endif %}
 # Your stuff...
