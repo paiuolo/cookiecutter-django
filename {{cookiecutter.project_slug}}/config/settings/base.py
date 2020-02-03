@@ -232,6 +232,12 @@ if _ENV_PUBLIC_ROOT is None:
 else:
     PUBLIC_ROOT = environ.Path(_ENV_PUBLIC_ROOT)
 
+_ENV_PRIVATE_ROOT = env('DJANGO_PRIVATE_ROOT', default=None)
+if _ENV_PRIVATE_ROOT is None:
+    PRIVATE_ROOT = ROOT_DIR.path("private")
+else:
+    PRIVATE_ROOT = environ.Path(_ENV_PRIVATE_ROOT)
+
 # https://docs.djangoproject.com/en/dev/ref/settings/#static-root
 STATIC_ROOT = str(PUBLIC_ROOT("static"))  # pai
 # https://docs.djangoproject.com/en/dev/ref/settings/#static-url
