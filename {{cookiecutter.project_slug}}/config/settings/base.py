@@ -104,7 +104,7 @@ if DEBUG:  # pai
     }
     DATABASES["default"]["ATOMIC_REQUESTS"] = True
 else:
-{% if cookiecutter.use_docker == "y" -%}
+{% if cookiecutter.use_docker == "y" %}
     DATABASES = {"default": env.db("DATABASE_URL")}
 {%- else %}
     DATABASES = {
@@ -233,7 +233,7 @@ else:
     PUBLIC_ROOT = environ.Path(_ENV_PUBLIC_ROOT)
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#static-root
-STATIC_ROOT = str(PUBLIC_ROOT("staticfiles"))  # pai
+STATIC_ROOT = str(PUBLIC_ROOT("static"))  # pai
 # https://docs.djangoproject.com/en/dev/ref/settings/#static-url
 STATIC_URL = "/static/"
 # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
