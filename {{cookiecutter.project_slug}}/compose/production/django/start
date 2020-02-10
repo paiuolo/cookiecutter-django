@@ -5,6 +5,6 @@ set -o pipefail
 set -o nounset
 
 
-exec python server.py  # pai
-# python manage.py collectstatic --chdir=/app
+python manage.py collectstatic
 
+exec python server.py  # pai
