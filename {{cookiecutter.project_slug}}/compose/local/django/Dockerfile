@@ -16,8 +16,6 @@ RUN apt-get update \
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements /requirements
 RUN pip install -r /requirements/local.txt
-RUN pip install --no-cache-dir -r /requirements/extra.txt  # pai
-RUN find /requirements -name '*.tar.gz' -exec pip install {} \;
 
 COPY ./compose/production/django/entrypoint /entrypoint
 RUN sed -i 's/\r$//g' /entrypoint

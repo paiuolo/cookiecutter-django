@@ -1,5 +1,5 @@
-{% raw %}{% load static i18n {% endraw %}{% if cookiecutter.use_compressor == "y" %}compress{% endif %}{% raw %}%}{% get_current_language as LANGUAGE_CODE %}<!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE }}">
+{% raw %}{% load static i18n {% endraw %}{% if cookiecutter.use_compressor == "y" %}compress{% endif %}{% raw %}%}<!DOCTYPE html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -35,7 +35,6 @@
   </head>
 
   <body>
-    {% block body %}
 
     <div class="mb-1">
       <nav class="navbar navbar-expand-md navbar-light bg-light">
@@ -53,15 +52,6 @@
               <a class="nav-link" href="{% url 'about' %}">About</a>
             </li>
             {% if request.user.is_authenticated %}
-              <li class="nav-item">
-              {# URL provided by django-sso-app/core/apps/profiles/urls.py #}
-                  <a class="nav-link" href="{% url 'profile' %}">{% trans "Profile" %}</a>
-              </li>
-              <li class="nav-item">
-              {# URL provided by django-sso-app/core/apps/profiles/urls.py #}
-                  <a class="nav-link" href="{% url 'profile.update' %}">{% trans "Update Profile" %}</a>
-              </li>
-
               <li class="nav-item">
                 {# URL provided by django-allauth/account/urls.py #}
                 <a class="nav-link" href="{% url 'users:detail' request.user.username  %}">{% trans "My Profile" %}</a>
@@ -101,8 +91,6 @@
     </div> <!-- /container -->
 
     {% block modal %}{% endblock modal %}
-
-    {% endblock body %}
 
     <!-- Le javascript
     ================================================== -->

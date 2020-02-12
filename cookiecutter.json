@@ -1,11 +1,11 @@
 {
-  "project_name": "DjangoCMS pai",
+  "project_name": "My Awesome Project",
   "project_slug": "{{ cookiecutter.project_name.lower()|replace(' ', '_')|replace('-', '_')|replace('.', '_')|trim() }}",
-  "description": "DjangoCMS on cookiecutter",
-  "author_name": "Luca Bertuol",
+  "description": "Behold My Awesome Project!",
+  "author_name": "Daniel Roy Greenfeld",
   "domain_name": "example.com",
-  "email": "paiuolo@gmail.com",
-  "version": "0.0.1",
+  "email": "{{ cookiecutter.author_name.lower()|replace(' ', '-') }}@example.com",
+  "version": "0.1.0",
   "open_source_license": [
     "MIT",
     "BSD",
@@ -15,12 +15,12 @@
   ],
   "timezone": "UTC",
   "windows": "n",
-  "use_pycharm": "y",
-  "use_docker": "y",
+  "use_pycharm": "n",
+  "use_docker": "n",
   "postgresql_version": [
-  	"9.6",
     "11.3",
     "10.8",
+    "9.6",
     "9.5",
     "9.4"
   ],
@@ -29,16 +29,16 @@
     "Gulp"
   ],
   "cloud_provider": [
-  	"None",
     "AWS",
-    "GCP"
+    "GCP",
+    "None"
   ],
-  "use_drf": "y",
+  "use_drf": "n",
   "custom_bootstrap_compilation": "n",
   "use_compressor": "n",
-  "use_celery": "y",
+  "use_celery": "n",
   "use_mailhog": "n",
-  "use_sentry": "y",
+  "use_sentry": "n",
   "use_whitenoise": "n",
   "use_heroku": "n",
   "ci_tool": [

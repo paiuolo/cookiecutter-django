@@ -29,9 +29,7 @@ RUN addgroup --system django \
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements /requirements
-RUN pip install --no-cache-dir -r /requirements/production.txt
-RUN pip install --no-cache-dir -r /requirements/extra.txt \
-    && find /requirements -name '*.tar.gz' -exec pip install {} \; \
+RUN pip install --no-cache-dir -r /requirements/production.txt \
     && rm -rf /requirements
 
 COPY ./compose/production/django/entrypoint /entrypoint
@@ -60,19 +58,12 @@ RUN sed -i 's/\r$//g' /start-flower
 RUN chmod +x /start-flower
 {%- endif %}
 
-
-# maintenance
-RUN mkdir /backups
-COPY ./compose/production/django/maintenance /usr/local/bin/maintenance
-RUN chmod +x /usr/local/bin/maintenance/*
-RUN mv /usr/local/bin/maintenance/* /usr/local/bin \
-    && rmdir /usr/local/bin/maintenance
-
 {%- if cookiecutter.js_task_runner == 'Gulp' %}
 COPY --from=client-builder --chown=django:django /app /app
 {% else %}
 COPY --chown=django:django . /app
 {%- endif %}
+
 USER django
 
 WORKDIR /app

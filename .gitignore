@@ -227,5 +227,3 @@ pip-selfcheck.json
 .idea/
 
 .pytest_cache/
-
-.idea/*

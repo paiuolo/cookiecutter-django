@@ -3,13 +3,11 @@ Base settings to build other settings files upon.
 """
 
 import environ
-import sys
-import os
 
 ROOT_DIR = (
     environ.Path(__file__) - 3
 )  # ({{ cookiecutter.project_slug }}/config/settings/base.py - 3 = {{ cookiecutter.project_slug }}/)
-APPS_DIR = ROOT_DIR.path("backend")
+APPS_DIR = ROOT_DIR.path("{{ cookiecutter.project_slug }}")
 
 env = environ.Env()
 
@@ -26,11 +24,11 @@ DEBUG = env.bool("DJANGO_DEBUG", False)
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # though not all of them may be available with every OS.
 # In Windows, this must be set to your system time zone.
-TIME_ZONE = env("DJANGO_TIME_ZONE", default="{{cookiecutter.timezone}}")  # pai
+TIME_ZONE = "{{ cookiecutter.timezone }}"
 # https://docs.djangoproject.com/en/dev/ref/settings/#language-code
-LANGUAGE_CODE = env("DJANGO_LANGUAGE_CODE", default="en")  # pai
+LANGUAGE_CODE = "en-us"
 # https://docs.djangoproject.com/en/dev/ref/settings/#site-id
-SITE_ID = env.int("DJANGO_SITE_ID", default=1)  # pai
+SITE_ID = 1
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-i18n
 USE_I18N = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-l10n
@@ -38,78 +36,17 @@ USE_L10N = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-tz
 USE_TZ = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#locale-paths
-LOCALE_PATHS = [str(ROOT_DIR.path("locale"))]
-
-# pai
-TESTING_MODE = 'test' in sys.argv
-BACKEND_DIR = ROOT_DIR.path("backend")
-
-APP_DOMAIN = env("APP_DOMAIN", default="localhost:8000")
-COOKIE_DOMAIN = env("COOKIE_DOMAIN", default=APP_DOMAIN)
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = env("ACCOUNT_DEFAULT_HTTP_PROTOCOL", default='http' if DEBUG else 'https')
-I18N_PATH_ENABLED = env.bool('I18N_PATH_ENABLED', default=True)
-REDIS_ENABLED = env.bool('REDIS_ENABLED', default=False)
-
-# file uploads
-FILE_UPLOAD_PERMISSIONS = 0o644
-FILE_UPLOAD_HANDLERS = [
-    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
-]
-
-# slashes
-APPEND_SLASH = True
-
-# django-sso-app
-from django_sso_app.settings import *
-from .extra import EXTRA_APPS
-
-DJANGO_SSO_APP_BACKEND_DOMAINS = env('DJANGO_SSO_APP_BACKEND_DOMAINS', default=[APP_DOMAIN])
-DJANGO_SSO_APP_SHAPE = env('DJANGO_SSO_APP_SHAPE', default='backend_only')
-_DJANGO_SSO_APP_BACKEND_ENABLED = DJANGO_SSO_APP_SHAPE.find('backend') > -1
-if _DJANGO_SSO_APP_BACKEND_ENABLED:
-    DJANGO_SSO_APP_APIGATEWAY_HOST = env('DJANGO_SSO_APP_APIGATEWAY_HOST', default='http://kong')
-    DJANGO_SSO_APP_BACKEND_CUSTOM_FRONTEND_APP = env('DJANGO_SSO_APP_BACKEND_CUSTOM_FRONTEND_APP', default=None)
-
-# context_processors
-REPOSITORY_REV = env("REPOSITORY_REV", default=None)
-EMAILS_DOMAIN = env('EMAILS_DOMAIN', default=COOKIE_DOMAIN) # domain name specified in email templates
-EMAILS_SITE_NAME = env('EMAILS_SITE_NAME', default=EMAILS_DOMAIN) # site name specified in email templates
-GOOGLE_API_KEY = env('GOOGLE_API_KEY', default='undefined')
-GOOGLE_MAPS_API_VERSION = env('GOOGLE_MAPS_API_VERSION', default='3.34')
-GOOGLE_ANALYTICS_TRACKING_ID = env('GOOGLE_ANALYTICS_TRACKING_ID', default='undefined')
-
-# languages
-from .languages import *
-
-# meta
-META_DESCRIPTION = env('META_DESCRIPTION', default=APP_DOMAIN)
-META_SITE_PROTOCOL = ACCOUNT_DEFAULT_HTTP_PROTOCOL
-META_USE_SITES = True
-# META_SITE_DOMAIN = APP_DOMAIN
-META_SITE_NAME = APP_DOMAIN
-META_USE_OG_PROPERTIES = True
-META_USE_TWITTER_PROPERTIES = True
-META_USE_GOOGLEPLUS_PROPERTIES = True
-
+LOCALE_PATHS = [ROOT_DIR.path("locale")]
 
 # DATABASES
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
-if DEBUG:  # pai
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(ROOT_DIR, 'db.sqlite3'),
-        }
-    }
-    DATABASES["default"]["ATOMIC_REQUESTS"] = True
-else:
-{% if cookiecutter.use_docker == "y" %}
-    DATABASES = {"default": env.db("DATABASE_URL")}
+{% if cookiecutter.use_docker == "y" -%}
+DATABASES = {"default": env.db("DATABASE_URL")}
 {%- else %}
-    DATABASES = {
-        "default": env.db("DATABASE_URL", default="postgres://{% if cookiecutter.windows == 'y' %}localhost{% endif %}/{{cookiecutter.project_slug}}")
-    }
+DATABASES = {
+    "default": env.db("DATABASE_URL", default="postgres://{% if cookiecutter.windows == 'y' %}localhost{% endif %}/{{cookiecutter.project_slug}}")
+}
 {%- endif %}
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
@@ -132,49 +69,41 @@ DJANGO_APPS = [
     # "django.contrib.humanize", # Handy template tags
     "django.contrib.admin",
     "django.forms",
-    "django.contrib.flatpages",
 ]
 THIRD_PARTY_APPS = [
     "crispy_forms",
-    # "allauth",  # django-sso-app
-    # "allauth.account",  # django-sso-app
-    # "allauth.socialaccount",  # django-sso-app
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
     "rest_framework",
-
-    # pai
-    "corsheaders",
-    "meta",
 {%- if cookiecutter.use_celery == 'y' %}
-    "django_filters",
     "django_celery_beat",
-    "django_celery_results",
-    "drf_yasg",
 {%- endif %}
 ]
 
 LOCAL_APPS = [
-    "backend.users.apps.UsersConfig",
+    "{{ cookiecutter.project_slug }}.users.apps.UsersConfig",
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS + DJANGO_SSO_APP_DJANGO_APPS + EXTRA_APPS  # pai
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 # MIGRATIONS
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#migration-modules
-# MIGRATION_MODULES = {"sites": "{{ cookiecutter.project_slug }}.contrib.sites.migrations"}  # pai
+MIGRATION_MODULES = {"sites": "{{ cookiecutter.project_slug }}.contrib.sites.migrations"}
 
 # AUTHENTICATION
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#authentication-backends
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
-    # "allauth.account.auth_backends.AuthenticationBackend",  # django-sso-app
-] + DJANGO_SSO_APP_DJANGO_AUTHENTICATION_BACKENDS
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
 AUTH_USER_MODEL = "users.User"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
-LOGIN_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = "users:redirect"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
 LOGIN_URL = "account_login"
 
@@ -188,7 +117,6 @@ PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
     "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
 ]
-""" pai
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -198,16 +126,12 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
-"""
-AUTH_PASSWORD_VALIDATORS = []  # pai
 
 # MIDDLEWARE
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
 MIDDLEWARE = [
-    "django_sso_app.backend.middleware.x_forwarded_for.middleware.XForwardedForMiddleware",  # pai
     "django.middleware.security.SecurityMiddleware",
-    "corsheaders.middleware.CorsMiddleware",  # pai
 {%- if cookiecutter.use_whitenoise == 'y' %}
     "whitenoise.middleware.WhiteNoiseMiddleware",
 {%- endif %}
@@ -216,34 +140,19 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django_sso_app.core.middleware.DjangoSsoAppAuthenticationMiddleware",  # django-sso-app
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.common.BrokenLinkEmailsMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "django.contrib.flatpages.middleware.FlatpageFallbackMiddleware",  # pai
 ]
 
 # STATIC
 # ------------------------------------------------------------------------------
-# pai
-_ENV_PUBLIC_ROOT = env('DJANGO_PUBLIC_ROOT', default=None)
-if _ENV_PUBLIC_ROOT is None:
-    PUBLIC_ROOT = ROOT_DIR.path("public")
-else:
-    PUBLIC_ROOT = environ.Path(_ENV_PUBLIC_ROOT)
-
-_ENV_PRIVATE_ROOT = env('DJANGO_PRIVATE_ROOT', default=None)
-if _ENV_PRIVATE_ROOT is None:
-    PRIVATE_ROOT = ROOT_DIR.path("private")
-else:
-    PRIVATE_ROOT = environ.Path(_ENV_PRIVATE_ROOT)
-
 # https://docs.djangoproject.com/en/dev/ref/settings/#static-root
-STATIC_ROOT = str(PUBLIC_ROOT("static"))  # pai
+STATIC_ROOT = str(ROOT_DIR("staticfiles"))
 # https://docs.djangoproject.com/en/dev/ref/settings/#static-url
 STATIC_URL = "/static/"
 # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
-STATICFILES_DIRS = [str(BACKEND_DIR.path("static"))]  # pai
+STATICFILES_DIRS = [str(APPS_DIR.path("static"))]
 # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
@@ -253,7 +162,7 @@ STATICFILES_FINDERS = [
 # MEDIA
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#media-root
-MEDIA_ROOT = str(PUBLIC_ROOT("media"))  # pai
+MEDIA_ROOT = str(APPS_DIR("media"))
 # https://docs.djangoproject.com/en/dev/ref/settings/#media-url
 MEDIA_URL = "/media/"
 
@@ -283,12 +192,7 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
-                # "{{ cookiecutter.project_slug }}.utils.context_processors.settings_context",  # pai
-
-                # django-sso-app
-                'django_sso_app.core.context_processors.django_sso_app_context',
-                'django_sso_app.backend.context_processors.get_repository_rev',
-                'django_sso_app.backend.context_processors.get_meta_info',
+                "{{ cookiecutter.project_slug }}.utils.context_processors.settings_context",
             ],
         },
     }
@@ -315,31 +219,6 @@ CSRF_COOKIE_HTTPONLY = True
 SECURE_BROWSER_XSS_FILTER = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#x-frame-options
 X_FRAME_OPTIONS = "DENY"
-
-# pai
-ENABLE_HTTPS = env.bool("ENABLE_HTTPS", default=not DEBUG)
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = env("ACCOUNT_DEFAULT_HTTP_PROTOCOL", default="https" if ENABLE_HTTPS else "http")
-
-# CSRF
-if DEBUG:
-    CSRF_COOKIE_DOMAIN = None
-    CORS_ORIGIN_ALLOW_ALL = True
-    CSRF_TRUSTED_ORIGINS = []
-else:
-    CSRF_COOKIE_DOMAIN = APP_DOMAIN
-    CSRF_TRUSTED_ORIGINS = ['.{0}'.format(COOKIE_DOMAIN)]
-
-# cors
-if DEBUG:
-    CORS_ORIGIN_ALLOW_ALL = True
-else:
-    # https://github.com/ottoyiu/django-cors-headers
-    # CORS headers defaults to 'accounts.example.com'
-    _CORS_ORIGINS = env("CORS_ORIGINS", default='{0}://{1}'.format(ACCOUNT_DEFAULT_HTTP_PROTOCOL, COOKIE_DOMAIN))
-    CORS_ORIGIN_WHITELIST = list(map(lambda x: '{}'.format(x.replace(' ', '')), _CORS_ORIGINS.split(',')))
-    #CORS_ORIGIN_WHITELIST = _CORS_ORIGINS.split(',')
-    CORS_ALLOW_CREDENTIALS = True
-
 
 # EMAIL
 # ------------------------------------------------------------------------------
@@ -389,25 +268,10 @@ LOGGING = {
 if USE_TZ:
     # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-timezone
     CELERY_TIMEZONE = TIME_ZONE
-""" pai
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-broker_url
 CELERY_BROKER_URL = env("CELERY_BROKER_URL")
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-result_backend
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
-"""
-if REDIS_ENABLED:
-    # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-broker_url
-    CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/0")
-    # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-result_backend
-    # CELERY_RESULT_BACKEND = CELERY_BROKER_URL
-else:
-    # https://docs.celeryproject.org/en/3.1/getting-started/brokers/django.html
-    CELERY_BROKER_URL = 'django://'
-    # django-sso-app
-    CELERY_CACHE_BACKEND = 'django-cache'
-
-CELERY_RESULT_BACKEND = 'django-db'  # pai
-
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-accept_content
 CELERY_ACCEPT_CONTENT = ["json"]
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-task_serializer
@@ -426,7 +290,6 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 {%- endif %}
 # django-allauth
 # ------------------------------------------------------------------------------
-""" pai
 ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 ACCOUNT_AUTHENTICATION_METHOD = "username"
@@ -438,20 +301,6 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_ADAPTER = "{{cookiecutter.project_slug}}.users.adapters.AccountAdapter"
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 SOCIALACCOUNT_ADAPTER = "{{cookiecutter.project_slug}}.users.adapters.SocialAccountAdapter"
-"""
-
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile',
-            'email',
-        ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
-        }
-    }
-}
-
 {% if cookiecutter.use_compressor == 'y' -%}
 # django-compressor
 # ------------------------------------------------------------------------------
@@ -465,25 +314,11 @@ STATICFILES_FINDERS += ["compressor.finders.CompressorFinder"]
 # django-rest-framework - https://www.django-rest-framework.org/api-guide/settings/
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        # "rest_framework.authentication.SessionAuthentication",  # pai
-        "django_sso_app.core.api.authentication.DjangoSsoApiAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.TokenAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
-
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
-    "PAGE_SIZE": 100,
-    # "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
-
-    "DATETIME_FORMAT": "%Y-%m-%dT%H:%M:%S%z",
-
-    # "DEFAULT_RENDERER_CLASSES": (
-    #     "rest_framework.renderers.JSONRenderer",
-    #     "rest_framework.renderers.BrowsableAPIRenderer",
-    # ),
 }
 {%- endif %}
 # Your stuff...
 # ------------------------------------------------------------------------------
-
-from .extra import *  # pai

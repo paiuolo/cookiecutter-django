@@ -93,12 +93,12 @@ class Migration(migrations.Migration):
                         default=django.utils.timezone.now, verbose_name="date joined"
                     ),
                 ),
-                # (
-                #     "name",
-                #     models.CharField(
-                #         blank=True, max_length=255, verbose_name="Name of User"
-                #     ),
-                # ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True, max_length=255, verbose_name="Name of User"
+                    ),
+                ),
                 (
                     "groups",
                     models.ManyToManyField(

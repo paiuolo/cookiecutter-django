@@ -18,36 +18,28 @@ from .base import env
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=[APP_DOMAIN])
+ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["{{ cookiecutter.domain_name }}"])
 
 # DATABASES
 # ------------------------------------------------------------------------------
 DATABASES["default"] = env.db("DATABASE_URL")  # noqa F405
-# DATABASES["default"]["ATOMIC_REQUESTS"] = True  # noqa F405  # pai
+DATABASES["default"]["ATOMIC_REQUESTS"] = True  # noqa F405
 DATABASES["default"]["CONN_MAX_AGE"] = env.int("CONN_MAX_AGE", default=60)  # noqa F405
 
 # CACHES
 # ------------------------------------------------------------------------------
-if REDIS_ENABLED:
-    CACHES = {
-        "default": {
-            "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": env("REDIS_URL"),
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient",
-                # Mimicing memcache behavior.
-                # http://niwinz.github.io/django-redis/latest/#_memcached_exceptions_behavior
-                "IGNORE_EXCEPTIONS": True,
-            },
-        }
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": env("REDIS_URL"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            # Mimicing memcache behavior.
+            # http://niwinz.github.io/django-redis/latest/#_memcached_exceptions_behavior
+            "IGNORE_EXCEPTIONS": True,
+        },
     }
-else:
-    CACHES = {
-        "default": {
-            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-            "LOCATION": "",
-        }
-    }
+}
 
 # SECURITY
 # ------------------------------------------------------------------------------
@@ -162,7 +154,7 @@ MEDIA_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/media/"
 # TEMPLATES
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#templates
-TEMPLATES[0]["OPTIONS"]["loaders"] = [  # noqa F405
+TEMPLATES[-1]["OPTIONS"]["loaders"] = [  # type: ignore[index] # noqa F405
     (
         "django.template.loaders.cached.Loader",
         [
@@ -176,13 +168,13 @@ TEMPLATES[0]["OPTIONS"]["loaders"] = [  # noqa F405
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#default-from-email
 DEFAULT_FROM_EMAIL = env(
-    "DJANGO_DEFAULT_FROM_EMAIL", default="{{cookiecutter.project_name}} <noreply@{}>".format(EMAILS_DOMAIN)
+    "DJANGO_DEFAULT_FROM_EMAIL", default="{{cookiecutter.project_name}} <noreply@{{cookiecutter.domain_name}}>"
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#server-email
 SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-subject-prefix
 EMAIL_SUBJECT_PREFIX = env(
-    "DJANGO_EMAIL_SUBJECT_PREFIX", default="[{}]".format(APP_DOMAIN)
+    "DJANGO_EMAIL_SUBJECT_PREFIX", default="[{{cookiecutter.project_name}}]"
 )
 
 # ADMIN
@@ -194,7 +186,6 @@ ADMIN_URL = env("DJANGO_ADMIN_URL")
 # ------------------------------------------------------------------------------
 # https://anymail.readthedocs.io/en/stable/installation/#installing-anymail
 INSTALLED_APPS += ["anymail"]  # noqa F405
-"""
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 # https://anymail.readthedocs.io/en/stable/installation/#anymail-settings-reference
 ANYMAIL = {
@@ -202,25 +193,8 @@ ANYMAIL = {
     "MAILGUN_SENDER_DOMAIN": env("MAILGUN_DOMAIN"),
     "MAILGUN_API_URL": env("MAILGUN_API_URL", default="https://api.mailgun.net/v3"),
 }
-"""
-if DEBUG or env.bool('DJANGO_CONSOLE_EMAIL_BACKEND', default=False):
-    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-else:
-    EMAIL_BACKEND = "anymail.backends.sendgrid.EmailBackend"
 
-# https://anymail.readthedocs.io/en/stable/installation/#anymail-settings-reference
-ANYMAIL = {
-    "SENDGRID_API_KEY": env("SENDGRID_API_KEY"),
-}
-
-{% if cookiecutter.use_whitenoise == 'y' -%}
-# WhiteNoise
-# ------------------------------------------------------------------------------
-# http://whitenoise.evans.io/en/latest/django.html#enable-whitenoise
-# MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")  # noqa F405 # pai
-
-{% endif %}
-{%- if cookiecutter.use_compressor == 'y' -%}
+{% if cookiecutter.use_compressor == 'y' -%}
 # django-compressor
 # ------------------------------------------------------------------------------
 # https://django-compressor.readthedocs.io/en/latest/settings/#django.conf.settings.COMPRESS_ENABLED
@@ -234,7 +208,7 @@ COMPRESS_URL = STATIC_URL{% if cookiecutter.use_whitenoise == 'y' or cookiecutte
 # Collectfast
 # ------------------------------------------------------------------------------
 # https://github.com/antonagestam/collectfast#installation
-# INSTALLED_APPS = ["collectfast"] + INSTALLED_APPS  # noqa F405  # pai
+INSTALLED_APPS = ["collectfast"] + INSTALLED_APPS  # noqa F405
 {% endif %}
 # LOGGING
 # ------------------------------------------------------------------------------

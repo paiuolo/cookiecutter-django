@@ -1,7 +1,7 @@
 import pytest
 
-from backend.users.forms import UserCreationForm
-from backend.users.tests.factories import UserFactory
+from {{ cookiecutter.project_slug }}.users.forms import UserCreationForm
+from {{ cookiecutter.project_slug }}.users.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
 

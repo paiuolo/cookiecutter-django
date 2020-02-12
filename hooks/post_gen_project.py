@@ -109,11 +109,6 @@ def remove_dotgitlabciyml_file():
     os.remove(".gitlab-ci.yml")
 
 
-# pai
-def rename_backend_folder():
-    os.rename("{{ cookiecutter.project_slug }}", "backend")
-
-
 def append_to_project_gitignore(path):
     gitignore_file_path = ".gitignore"
     with open(gitignore_file_path, "a") as gitignore_file:
@@ -371,10 +366,6 @@ def main():
 
     if "{{ cookiecutter.use_drf }}".lower() == "n":
         remove_drf_starter_files()
-			
-    # pai
-    rename_backend_folder()
-
 
     print(SUCCESS + "Project initialized, keep up the good work!" + TERMINATOR)
 
