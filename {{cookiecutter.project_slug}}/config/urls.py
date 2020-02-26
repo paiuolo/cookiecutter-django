@@ -119,10 +119,25 @@ urlpatterns += [
     # url(r'^api/v1/redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
 
+# extra
+
+from .extra_urls import urlpatterns as extra_urlpatterns
+from .extra_urls import i18n_urlpatterns as extra_i18n_urlpatterns
+
+if len(extra_urlpatterns) > 0:
+    urlpatterns += extra_urlpatterns
+
 if settings.I18N_PATH_ENABLED:
+    if len(extra_i18n_urlpatterns) > 0:
+        urlpatterns += i18n_patterns(extra_i18n_urlpatterns)  #  + [])
+
     for lang, _name in settings.LANGUAGES:
         # flatpages
-        urlpatterns.append(path(_('{}/about/'.format(lang)), flatpage, {'url': '/{}/about/'.format(lang)}, name='about-{}'.format(lang)))
+        urlpatterns.append(path(_('{}/about/'.format(lang)), flatpage, {'url': '/{}/about/'.format(lang)},
+                                name='about-{}'.format(lang)))
+else:
+    if len(extra_i18n_urlpatterns) > 0:
+        urlpatterns += extra_i18n_urlpatterns  # + []
 
 # flatpages
 urlpatterns += [
