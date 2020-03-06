@@ -21,7 +21,7 @@ source "${working_dir}/_sourced/messages.sh"
 message_welcome "Backing up '${APP_NAME}'..."
 
 
-python manage.py dumpdata --indent=4 --natural-primary --natural-foreign \
+python manage.py dumpdata --indent=4 --natural-foreign \
     -e auth.permission -e contenttypes -e sessions -e admin  > dump_all.json
 
 backup_filename="${BACKUP_FILE_PREFIX}_$(date +'%Y_%m_%dT%H_%M_%S').${APP_NAME}.gz"

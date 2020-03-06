@@ -111,6 +111,11 @@ api_urlpatterns += [
     # your api here
 ]
 
+# extra
+from .extra_urls import api_urlpatterns as extra_api_urlpatterns
+if len(extra_api_urlpatterns):
+    api_urlpatterns += extra_api_urlpatterns
+
 urlpatterns += api_urlpatterns
 
 urlpatterns += [

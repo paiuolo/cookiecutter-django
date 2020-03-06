@@ -205,7 +205,7 @@ AUTH_PASSWORD_VALIDATORS = []  # pai
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
 MIDDLEWARE = [
-    "django_sso_app.backend.middleware.x_forwarded_for.middleware.XForwardedForMiddleware",  # pai
+    "django_sso_app.core.middleware.x_forwarded_for.XForwardedForMiddleware",  # django-sso-app
     "django.middleware.security.SecurityMiddleware",
     "corsheaders.middleware.CorsMiddleware",  # pai
 {%- if cookiecutter.use_whitenoise == 'y' %}
@@ -216,7 +216,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django_sso_app.core.middleware.DjangoSsoAppAuthenticationMiddleware",  # django-sso-app
+    "django_sso_app.core.middleware.authentication.DjangoSsoAppAuthenticationMiddleware",  # django-sso-app
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.common.BrokenLinkEmailsMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",

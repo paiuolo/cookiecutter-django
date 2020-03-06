@@ -35,4 +35,15 @@ message_welcome "Restoring '${APP_NAME}' from the '${backup_filename}' backup...
 
 tar xvjf "${BACKUP_DIR_PATH}/${1}"
 
-python manage.py loaddata dump_all.json
+
+if [[ ${backup_filename} == *"media.gz" ]]
+then
+    echo "Media backup"
+elif [[ ${backup_filename} == *"private.gz" ]]
+then
+    echo "Private backup"
+else
+    echo "loaddata backup"
+    python manage.py loaddata dump_all.json
+fi
+
