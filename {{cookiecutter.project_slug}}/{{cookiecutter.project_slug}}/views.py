@@ -14,6 +14,8 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
+from .permissions import is_staff
+
 logger = logging.getLogger('backend')
 CURRENT_DIR = os.getcwd()
 
@@ -77,7 +79,7 @@ class StatsView(APIView):
                 'meta': str(request.META.items())
             }
 
-            if request.user is not None and request.user.is_staff:
+            if is_staff(request.user):
                 data['free_space_mb'] = free_space_mb
 
             return Response(data, status.HTTP_200_OK)

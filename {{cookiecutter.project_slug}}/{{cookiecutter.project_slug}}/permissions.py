@@ -2,11 +2,9 @@ import logging
 
 from rest_framework.permissions import IsAuthenticated
 
+from django_sso_app.core.permissions import is_staff
+
 logger = logging.getLogger('django')
-
-
-def is_staff(user):
-    return user and (user.is_staff or user.groups.filter(name='staff').count() > 0)
 
 
 class PublicObjectOrOwnerOrStaffPermission(IsAuthenticated):
