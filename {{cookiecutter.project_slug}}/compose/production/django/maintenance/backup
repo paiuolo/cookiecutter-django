@@ -27,10 +27,10 @@ python manage.py dumpdata --indent=4 --natural-foreign \
 backup_filename="${BACKUP_FILE_PREFIX}_$(date +'%Y_%m_%dT%H_%M_%S').${APP_NAME}.gz"
 tar cvjf "${BACKUP_DIR_PATH}/${backup_filename}" ./dump_all.json
 
-media_backup_filename="${BACKUP_FILE_PREFIX}_$(date +'%Y_%m_%dT%H_%M_%S').${APP_NAME}.media.gz"
+public_backup_filename="${BACKUP_FILE_PREFIX}_$(date +'%Y_%m_%dT%H_%M_%S').${APP_NAME}.public.gz"
 tar --exclude='./public/media/filer_public_thumbnails' cvjf \
-    "${BACKUP_DIR_PATH}/${media_backup_filename}" \
-    ./public/media
+    "${BACKUP_DIR_PATH}/${public_backup_filename}" \
+    ./public
 
 private_backup_filename="${BACKUP_FILE_PREFIX}_$(date +'%Y_%m_%dT%H_%M_%S').${APP_NAME}.private.gz"
 tar cvjf \
