@@ -36,9 +36,9 @@ message_welcome "Restoring '${APP_NAME}' from the '${backup_filename}' backup...
 tar xvjf "${BACKUP_DIR_PATH}/${1}"
 
 
-if [[ ${backup_filename} == *"media.gz" ]]
+if [[ ${backup_filename} == *"public.gz" ]]
 then
-    echo "Media backup"
+    echo "Public backup"
 elif [[ ${backup_filename} == *"private.gz" ]]
 then
     echo "Private backup"
