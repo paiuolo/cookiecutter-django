@@ -9,7 +9,7 @@
 ### Usage:
 ###     $ docker-compose -f <environment>.yml (exec |run --rm) postgres restore <1>
 
-APP_NAME='django-uploads'
+APP_NAME='{{ cookiecutter.project_slug }}'
 
 set -o errexit
 set -o pipefail
