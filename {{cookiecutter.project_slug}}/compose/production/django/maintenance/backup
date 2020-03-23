@@ -28,6 +28,8 @@ python manage.py dumpdata --indent=4 --natural-foreign \
 backup_filename="${BACKUP_FILE_PREFIX}_${CUR_DATE}.${APP_NAME}.gz"
 tar cvjf "${BACKUP_DIR_PATH}/${backup_filename}" ./dump_all.json
 
+# copying dump_all.json
+cp -v dump_all.json ${BACKUP_DIR_PATH}/
 
 public_backup_filename="${BACKUP_FILE_PREFIX}_${CUR_DATE}.${APP_NAME}.public.gz"
 tar --exclude='./public/media/filer_public_thumbnails' cvjf \
