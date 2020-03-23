@@ -17,6 +17,7 @@ working_dir="$(dirname ${0})"
 source "${working_dir}/_sourced/constants.sh"
 source "${working_dir}/_sourced/messages.sh"
 
+CUR_DATE=$(date +'%Y_%m_%dT%H_%M_%S')
 
 message_welcome "Backing up '${APP_NAME}'..."
 
@@ -24,15 +25,16 @@ message_welcome "Backing up '${APP_NAME}'..."
 python manage.py dumpdata --indent=4 --natural-foreign \
     -e auth.permission -e contenttypes -e sessions -e admin  > dump_all.json
 
-backup_filename="${BACKUP_FILE_PREFIX}_$(date +'%Y_%m_%dT%H_%M_%S').${APP_NAME}.gz"
+backup_filename="${BACKUP_FILE_PREFIX}_${CUR_DATE}.${APP_NAME}.gz"
 tar cvjf "${BACKUP_DIR_PATH}/${backup_filename}" ./dump_all.json
 
-public_backup_filename="${BACKUP_FILE_PREFIX}_$(date +'%Y_%m_%dT%H_%M_%S').${APP_NAME}.public.gz"
+
+public_backup_filename="${BACKUP_FILE_PREFIX}_${CUR_DATE}.${APP_NAME}.public.gz"
 tar --exclude='./public/media/filer_public_thumbnails' cvjf \
     "${BACKUP_DIR_PATH}/${public_backup_filename}" \
     ./public
 
-private_backup_filename="${BACKUP_FILE_PREFIX}_$(date +'%Y_%m_%dT%H_%M_%S').${APP_NAME}.private.gz"
+private_backup_filename="${BACKUP_FILE_PREFIX}_${CUR_DATE}.${APP_NAME}.private.gz"
 tar cvjf \
     "${BACKUP_DIR_PATH}/${private_backup_filename}" \
     ./private
