@@ -5,7 +5,7 @@ from rest_framework.mixins import RetrieveModelMixin, ListModelMixin, UpdateMode
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from .serializers import UserSerializer
+from ..serializers import UserSerializer
 
 User = get_user_model()
 
