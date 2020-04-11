@@ -18,9 +18,9 @@
   "use_pycharm": "n",
   "use_docker": "n",
   "postgresql_version": [
+    "9.6",
     "11.3",
     "10.8",
-    "9.6",
     "9.5",
     "9.4"
   ],
@@ -29,28 +29,28 @@
     "Gulp"
   ],
   "cloud_provider": [
+    "None",
     "AWS",
-    "GCP",
-    "None"
+    "GCP"
   ],
   "mail_service": [
+    "Sendgrid",
     "Mailgun",
     "Amazon SES",
     "Mailjet",
     "Mandrill",
     "Postmark",
-    "Sendgrid",
     "SendinBlue",
     "SparkPost",
     "Other SMTP"
   ],
-  "use_drf": "n",
+  "use_drf": "y",
   "custom_bootstrap_compilation": "n",
   "use_compressor": "n",
   "use_celery": "n",
   "use_mailhog": "n",
   "use_sentry": "n",
-  "use_whitenoise": "n",
+  "use_whitenoise": "y",
   "use_heroku": "n",
   "ci_tool": [
     "None",
